@@ -67,7 +67,10 @@ public class BubbleUpEventDispatcher implements MouseListener
         }
         else
         {
-            click.actionPerformed(new ActionEvent(e.getSource(), e.getID(), "click"));
+            if (click != null)
+            {
+                click.actionPerformed(new ActionEvent(e.getSource(), e.getID(), "click"));
+            }
         }
     }
 

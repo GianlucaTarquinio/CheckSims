@@ -93,7 +93,7 @@ public class FileInputOption extends JPanel
         
         JLabel close = new JLabel(" x ", SwingConstants.CENTER);
         JLabel browse = new JLabel(" ... ", SwingConstants.CENTER);
-        int iconHeight = Math.max(height - 2, 1);
+        int iconHeight = Math.max(height - 10, 1);
         ImageIcon downloadImage = new ImageIcon(new ImageIcon(getClass().getResource("/net/lldp/checksims/ui/download_icon.png")).getImage().getScaledInstance(iconHeight, iconHeight, Image.SCALE_SMOOTH), "Download files");
         JLabel download = new JLabel(downloadImage);
         System.out.println("");

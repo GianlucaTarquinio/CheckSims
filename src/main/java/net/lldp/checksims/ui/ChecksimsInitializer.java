@@ -45,6 +45,7 @@ import net.lldp.checksims.algorithm.AlgorithmRegistry;
 import net.lldp.checksims.algorithm.SimilarityDetector;
 import net.lldp.checksims.parse.Percentable;
 import net.lldp.checksims.ui.file.FileInputOptionAccordionList;
+import net.lldp.checksims.ui.file.FileInputType;
 import net.lldp.checksims.ui.help.Direction;
 import net.lldp.checksims.ui.help.DocumentationProvider;
 import net.lldp.checksims.ui.help.DocumentationProviderPanel;
@@ -126,9 +127,9 @@ public class ChecksimsInitializer extends JPanel
 
 
         JPanel selectors = new JPanel();
-        FileInputOptionAccordionList subs = new FileInputOptionAccordionList(f, selectors, "source");
-        FileInputOptionAccordionList archs = new FileInputOptionAccordionList(f, selectors, "archive");
-        FileInputOptionAccordionList common = new FileInputOptionAccordionList(f, selectors, "common code", FileInputOptionAccordionList.SingleInput);
+        FileInputOptionAccordionList subs = new FileInputOptionAccordionList(f, selectors, FileInputType.SOURCE);
+        FileInputOptionAccordionList archs = new FileInputOptionAccordionList(f, selectors, FileInputType.ARCHIVE);
+        FileInputOptionAccordionList common = new FileInputOptionAccordionList(f, selectors, FileInputType.COMMON, FileInputOptionAccordionList.SingleInput);
         JPanel bot = new JPanel();
         
         subs.setBackground(ChecksimsColors.WPI_GREY);

@@ -28,13 +28,14 @@ public class FileInputOptionAccordionList extends DocumentationProviderPanel
     private final JFrame superParent;
     private final JComponent parent;
     private final Boolean multiselect;
+    private final String typeText;
     
-    public FileInputOptionAccordionList(JFrame repack, JComponent parent, String type)
+    public FileInputOptionAccordionList(JFrame repack, JComponent parent, FileInputType type)
     {
         this(repack, parent, type, true);
     }
     
-    public FileInputOptionAccordionList(JFrame f, JComponent selectors, String string, boolean b)
+    public FileInputOptionAccordionList(JFrame f, JComponent selectors, FileInputType type, boolean b)
     {
         fios = new TreeSet<>(new Comparator<FileInputOption>(){
             @Override
@@ -44,7 +45,8 @@ public class FileInputOptionAccordionList extends DocumentationProviderPanel
             }
         });
         
-        click = new JButton(string.toUpperCase() + ": Add a directory or turnin zip file");
+        typeText = getTypeText(type);
+        click = new JButton(typeText + ": Add a directory or turnin zip file");
         FileInputOptionAccordionList self = this;
         click.addMouseListener(new BubbleUpEventDispatcher(this, new ActionListener(){
 
@@ -52,7 +54,7 @@ public class FileInputOptionAccordionList extends DocumentationProviderPanel
             public void actionPerformed(ActionEvent ae)
             {
                 click.setEnabled(multiselect);
-                FileInputOption fio = new FileInputOption(self, nextID++, 50, 400);
+                FileInputOption fio = new FileInputOption(self, nextID++, 50, 400, type == FileInputType.SOURCE ? true : false);
                 fio.addMouseListener(new BubbleUpEventDispatcher(self));
                 fios.add(fio);
                 Dimension d = parent.getPreferredSize();
@@ -61,7 +63,7 @@ public class FileInputOptionAccordionList extends DocumentationProviderPanel
                 
                 repopulate();
                 
-                click.setText(string.toUpperCase() + ": Add another directory or turnin zip file");
+                click.setText(typeText + ": Add another directory or turnin zip file");
             }
             
         }));
@@ -110,6 +112,18 @@ public class FileInputOptionAccordionList extends DocumentationProviderPanel
             result.add(f);
         }
         return result;
+    }
+    
+    private String getTypeText(FileInputType type) {
+    		switch(type) {
+    		case SOURCE:
+    			return "SOURCE";
+    		case ARCHIVE:
+    			return "ARCHIVE";
+    		case COMMON:
+    			return "COMMON CODE";
+    		}
+    		return "";
     }
 
     @Override

@@ -24,19 +24,23 @@ import java.awt.Dimension;
 import java.io.File;
 
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import java.awt.Image;
+
+import net.lldp.checksims.ui.ChecksimsInitializer;
 import net.lldp.checksims.ui.buttons.FancyButtonAction;
 import net.lldp.checksims.ui.buttons.FancyButtonColorTheme;
 import net.lldp.checksims.ui.buttons.FancyButtonMouseListener;
 
 /**
  * A simple UI for file picking with a cancel, view, and browse display
- * used in accordians for batch file picking
+ * used in accordions for batch file picking
  * @author ted
  *
  */
@@ -75,12 +79,13 @@ public class FileInputOption extends JPanel
     
     /**
      * create a default FileInputOption UI
-     * @param parent the parent accordian
+     * @param parent the parent accordion
      * @param ID the numeric ID of this option
      * @param height the height of this option
      * @param width the width of this option
+     * @param hasDownloadButton true if this option should have a download button
      */
-    public FileInputOption(FileInputOptionAccordionList parent, long ID, int height, int width)
+    public FileInputOption(FileInputOptionAccordionList parent, long ID, int height, int width, boolean hasDownloadButton)
     {
         this.ID = ID;
         FileInputOption self = this;
@@ -88,22 +93,28 @@ public class FileInputOption extends JPanel
         
         JLabel close = new JLabel(" x ", SwingConstants.CENTER);
         JLabel browse = new JLabel(" ... ", SwingConstants.CENTER);
+        int iconHeight = Math.max(height - 2, 1);
+        ImageIcon downloadImage = new ImageIcon(new ImageIcon(getClass().getResource("/net/lldp/checksims/ui/download_icon.png")).getImage().getScaledInstance(iconHeight, iconHeight, Image.SCALE_SMOOTH), "Download files");
+        JLabel download = new JLabel(downloadImage);
+        System.out.println("");
         path = new JTextField();
         
         path.setEditable(false);
         
         close.setPreferredSize(new Dimension(height, height));
         browse.setPreferredSize(new Dimension(height, height));
+        download.setPreferredSize(new Dimension(height, height));
+        
         close.setMinimumSize(new Dimension(height, height));
         browse.setMinimumSize(new Dimension(height, height));
+        download.setMinimumSize(new Dimension(height, height));
+        
         close.setMaximumSize(new Dimension(height, height));
         browse.setMaximumSize(new Dimension(height, height));
+        download.setMaximumSize(new Dimension(height, height));
+        
         path.setPreferredSize(new Dimension(width-2*height, height));
         setPreferredSize(new Dimension(width, height));
-        
-        add(close);
-        add(path);
-        add(browse);
         
         browse.addMouseListener(new FancyButtonMouseListener(browse, new FieldEditorAction(path), FancyButtonColorTheme.BROWSE));
         close.addMouseListener(new FancyButtonMouseListener(close, new FancyButtonAction(){
@@ -113,6 +124,17 @@ public class FileInputOption extends JPanel
                 parent.remove(self);
             }
         }, FancyButtonColorTheme.CLOSE));
+        download.addMouseListener(new FancyButtonMouseListener(download, new FancyButtonAction() {
+        		@Override
+        		public void performAction() {
+        			System.out.println("HELLO THERE");
+        		}
+        }, FancyButtonColorTheme.BROWSE));
+        
+        add(close);
+        add(path);
+        add(browse);
+        add(download);
     }
 
     /**

@@ -50,9 +50,16 @@ public class FileInputOption extends JPanel
     {
         private final JTextField path;
         private final JFileChooser fc;
-        public FieldEditorAction(JTextField path)
+        private long ID;
+        private ChecksimsInitializer app;
+        private FileInputType type;
+        
+        public FieldEditorAction(JTextField path, ChecksimsInitializer app, long ID, FileInputType type)
         {
+        		this.app = app;
             this.path = path;
+            this.ID = ID;
+            this.type = type;
             
             fc = new JFileChooser();
             fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -69,6 +76,7 @@ public class FileInputOption extends JPanel
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = fc.getSelectedFile();
                 path.setText(file.getAbsolutePath());
+                app.getMenu().setEntry(ID, path.getText(), type);
             }
         }
         
@@ -76,6 +84,8 @@ public class FileInputOption extends JPanel
     
     private final long ID;
     private final JTextField path;
+    private ChecksimsInitializer app;
+    private FileInputType type;
     
     /**
      * create a default FileInputOption UI
@@ -85,38 +95,34 @@ public class FileInputOption extends JPanel
      * @param width the width of this option
      * @param hasDownloadButton true if this option should have a download button
      */
-    public FileInputOption(FileInputOptionAccordionList parent, long ID, int height, int width, boolean hasDownloadButton)
+    public FileInputOption(FileInputOptionAccordionList parent, ChecksimsInitializer a, long ID, int height, int width, FileInputType type)
     {
+    		app = a;
         this.ID = ID;
+        this.type = type;
         FileInputOption self = this;
         setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
         
         JLabel close = new JLabel(" x ", SwingConstants.CENTER);
         JLabel browse = new JLabel(" ... ", SwingConstants.CENTER);
-        int iconHeight = Math.max(height - 10, 1);
-        ImageIcon downloadImage = new ImageIcon(new ImageIcon(getClass().getResource("/net/lldp/checksims/ui/download_icon.png")).getImage().getScaledInstance(iconHeight, iconHeight, Image.SCALE_SMOOTH), "Download files");
-        JLabel download = new JLabel(downloadImage);
-        System.out.println("");
+        
         path = new JTextField();
         
         path.setEditable(false);
         
         close.setPreferredSize(new Dimension(height, height));
         browse.setPreferredSize(new Dimension(height, height));
-        download.setPreferredSize(new Dimension(height, height));
         
         close.setMinimumSize(new Dimension(height, height));
         browse.setMinimumSize(new Dimension(height, height));
-        download.setMinimumSize(new Dimension(height, height));
         
         close.setMaximumSize(new Dimension(height, height));
         browse.setMaximumSize(new Dimension(height, height));
-        download.setMaximumSize(new Dimension(height, height));
         
         path.setPreferredSize(new Dimension(width-2*height, height));
         setPreferredSize(new Dimension(width, height));
         
-        browse.addMouseListener(new FancyButtonMouseListener(browse, new FieldEditorAction(path), FancyButtonColorTheme.BROWSE));
+        browse.addMouseListener(new FancyButtonMouseListener(browse, new FieldEditorAction(path, app, ID, type), FancyButtonColorTheme.BROWSE));
         close.addMouseListener(new FancyButtonMouseListener(close, new FancyButtonAction(){
             @Override
             public void performAction()
@@ -124,17 +130,27 @@ public class FileInputOption extends JPanel
                 parent.remove(self);
             }
         }, FancyButtonColorTheme.CLOSE));
-        download.addMouseListener(new FancyButtonMouseListener(download, new FancyButtonAction() {
-        		@Override
-        		public void performAction() {
-        			System.out.println("HELLO THERE");
-        		}
-        }, FancyButtonColorTheme.BROWSE));
         
         add(close);
         add(path);
-        add(browse);
-        add(download);
+        add(browse);       
+        if(type == FileInputType.SOURCE) {
+	    		int iconHeight = Math.max(height - 10, 1);
+	    		ImageIcon downloadImage = new ImageIcon(new ImageIcon(getClass().getResource("/net/lldp/checksims/ui/download_icon.png")).getImage().getScaledInstance(iconHeight, iconHeight, Image.SCALE_SMOOTH), "Download files");
+	    		JLabel download = new JLabel(downloadImage);
+	    		download.setPreferredSize(new Dimension(height, height));
+	    		download.setMinimumSize(new Dimension(height, height));
+	    		download.setMaximumSize(new Dimension(height, height));
+	    		
+	    		download.addMouseListener(new FancyButtonMouseListener(download, new FancyButtonAction() {
+	        		@Override
+	        		public void performAction() {
+	        			System.out.println("HELLO THERE");
+	        		}
+	        }, FancyButtonColorTheme.BROWSE));
+	    		
+	    		add(download);
+	    }
     }
 
     /**
@@ -152,5 +168,17 @@ public class FileInputOption extends JPanel
     public File asFile()
     {
         return new File(path.getText());
+    }
+    
+    public String getPath() {
+    		return path.getText();
+    }
+    
+    public void setPath(String path) {
+    		this.path.setText(path);
+    }
+    
+    public FileInputType getType() {
+    		return type;
     }
 }

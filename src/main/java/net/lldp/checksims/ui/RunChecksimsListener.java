@@ -31,9 +31,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
 import net.lldp.checksims.ChecksimsCommandLine;
@@ -54,7 +56,8 @@ import net.lldp.checksims.ui.results.GraphicalMatrixPrinter;
  */
 public class RunChecksimsListener implements ActionListener
 {
-    private final ChecksimsInitializer uiPanel;
+    private JPanel uiPanel;
+    private final ChecksimsInitializer app;
     private final FileInputOptionAccordionList submissionPaths;
     private final FileInputOptionAccordionList archivePaths;
     private final FileInputOptionAccordionList commonCode;
@@ -78,8 +81,9 @@ public class RunChecksimsListener implements ActionListener
         this.archivePaths = archivePaths;
         this.commonCode = commonCode;
         this.selection = list;
+        app = checksimsInitializer;
 
-        uiPanel = checksimsInitializer;
+        uiPanel = new JPanel();
     }
 
     @Override
@@ -104,7 +108,7 @@ public class RunChecksimsListener implements ActionListener
                     progressBar.setValue(0);
                     overallStatus.setValue(0);
                     
-                    uiPanel.removeAll();
+                    uiPanel.setLayout(new BoxLayout(uiPanel, BoxLayout.Y_AXIS));
                     uiPanel.add(progressBar);
                     uiPanel.add(percent);
                     uiPanel.add(eta);
@@ -112,10 +116,12 @@ public class RunChecksimsListener implements ActionListener
                     uiPanel.add(message);
                     uiPanel.add(overallStatus, BorderLayout.SOUTH);
                     
+                    app.setPanel(uiPanel);
+                    
                     tickProgress(overallStatus, message, "initializing");
                     
                     
-                    conf.setStatusLogger(new ProgressBarStatusLogger(progressBar, percent, eta, elapsed, uiPanel.getWindow()));
+                    conf.setStatusLogger(new ProgressBarStatusLogger(progressBar, percent, eta, elapsed, app.getWindow()));
                     tickProgress(overallStatus, message, "creating UI display");
                     
                     conf.ignoreInvalid();
@@ -145,7 +151,7 @@ public class RunChecksimsListener implements ActionListener
                     }
                     catch (IOException | ChecksimsException e)
                     {
-                        uiPanel.UhOhException(e, "Invalid Submission Directory");
+                        app.UhOhException(e, "Invalid Submission Directory");
                         return;
                     }
                     tickProgress(overallStatus, message, "loading archived submissions (this may take a while)");
@@ -162,7 +168,7 @@ public class RunChecksimsListener implements ActionListener
                     }
                     catch (IOException | ChecksimsException e)
                     {
-                        uiPanel.UhOhException(e, "Invalid Archive Directory");
+                        app.UhOhException(e, "Invalid Archive Directory");
                         return;
                     }
                     
@@ -191,12 +197,13 @@ public class RunChecksimsListener implements ActionListener
                     }
                     catch (Exception e)
                     {
-                        uiPanel.UhOhException(e, "Invalid Common Code Directory");
+                        app.UhOhException(e, "Invalid Common Code Directory");
                         return;
                     }
                     
                     
                     tickProgress(overallStatus, message, "Comparing Student submissions");
+                    
                     
                     new Thread() {
                         @Override
@@ -213,14 +220,14 @@ public class RunChecksimsListener implements ActionListener
                             }
                             catch (ChecksimsException e)
                             {
-                                uiPanel.UhOhException(e);
+                            		app.UhOhException(e);
                             }
                         }
                     }.start();
                 }
                 catch (Exception e)
                 {
-                    uiPanel.UhOhException(e);
+                		app.UhOhException(e);
                 }
             }
         }.start();   
@@ -234,7 +241,7 @@ public class RunChecksimsListener implements ActionListener
         }
         catch (InterruptedException e)
         {
-            // TODO Auto-generated catch block
+        		app.UhOhException(e);
             e.printStackTrace();
         }
         progress.setValue(progress.getValue()+1);

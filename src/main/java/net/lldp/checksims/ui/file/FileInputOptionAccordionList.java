@@ -15,6 +15,9 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
+import net.lldp.checksims.ui.AccordionListEntry;
+import net.lldp.checksims.ui.ChecksimsInitializer;
+import net.lldp.checksims.ui.MainMenu;
 import net.lldp.checksims.ui.help.Direction;
 import net.lldp.checksims.ui.help.DocumentationProviderPanel;
 import net.lldp.checksims.ui.lib.BubbleUpEventDispatcher;
@@ -24,19 +27,21 @@ public class FileInputOptionAccordionList extends DocumentationProviderPanel
     public static final boolean SingleInput = false;
     private final SortedSet<FileInputOption> fios;
     private final JButton click; // TODO replace with fancy button
-    private long nextID = 0;
     private final JFrame superParent;
     private final JComponent parent;
     private final Boolean multiselect;
     private final String typeText;
+    ChecksimsInitializer app;
     
-    public FileInputOptionAccordionList(JFrame repack, JComponent parent, FileInputType type)
+    public FileInputOptionAccordionList(ChecksimsInitializer app, JComponent parent, FileInputType type)
     {
-        this(repack, parent, type, true);
+        this(app, parent, type, true);
     }
     
-    public FileInputOptionAccordionList(JFrame f, JComponent selectors, FileInputType type, boolean b)
+    public FileInputOptionAccordionList(ChecksimsInitializer a, JComponent selectors, FileInputType type, boolean b)
     {
+    		app = a;
+    		JFrame f = a.getFrame();
         fios = new TreeSet<>(new Comparator<FileInputOption>(){
             @Override
             public int compare(FileInputOption a, FileInputOption b)
@@ -54,9 +59,10 @@ public class FileInputOptionAccordionList extends DocumentationProviderPanel
             public void actionPerformed(ActionEvent ae)
             {
                 click.setEnabled(multiselect);
-                FileInputOption fio = new FileInputOption(self, nextID++, 50, 400, type == FileInputType.SOURCE ? true : false);
+                FileInputOption fio = new FileInputOption(self, app, app.getMenu().getNextID(type), 50, 400, type);
                 fio.addMouseListener(new BubbleUpEventDispatcher(self));
                 fios.add(fio);
+                app.getMenu().addEntry(new AccordionListEntry(fio.getPath(), fio.getID()), type);
                 Dimension d = parent.getPreferredSize();
                 d.setSize(d.getWidth(), d.getHeight()+50);
                 parent.setPreferredSize(d);
@@ -73,6 +79,12 @@ public class FileInputOptionAccordionList extends DocumentationProviderPanel
         multiselect = b;
         
         repopulate();
+    }
+    
+    public void addFIO(long ID, String path, FileInputType type) {
+    		FileInputOption fio = new FileInputOption(this, app, ID, 50, 400, type);
+    		fio.setPath(path);
+    		fios.add(fio);
     }
 
     private void repopulate()
@@ -92,6 +104,7 @@ public class FileInputOptionAccordionList extends DocumentationProviderPanel
     public void remove(FileInputOption fio)
     {
         fios.remove(fio);
+        app.getMenu().removeEntry(fio.getID(), fio.getType());
         Dimension d = parent.getPreferredSize();
         d.setSize(d.getWidth(), d.getHeight()-50);
         parent.setPreferredSize(d);

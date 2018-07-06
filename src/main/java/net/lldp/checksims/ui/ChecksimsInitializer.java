@@ -60,8 +60,9 @@ import net.lldp.checksims.ui.lib.BubbleUpEventDispatcher;
  */
 public class ChecksimsInitializer extends JPanel
 {
-    private final JButton checkSims;
     private final JFrame titleableFrame;
+    private MainMenu menu;
+    private MainMenuView menuView;
     
     /**
      * Use this panel to show exceptions. Hide the other UI components
@@ -73,10 +74,10 @@ public class ChecksimsInitializer extends JPanel
     {
         if (helpfulTip == null || helpfulTip != null)
         { // just show the exception
-            this.removeAll();
-            this.setLayout(new GridLayout(1, 1));
+        		JPanel panel = new JPanel();
+        		panel.setLayout(new GridLayout(1, 1));
             JTextPane jta = new JTextPane();
-            this.add(jta);
+            panel.add(jta);
             StyledDocument doc = jta.getStyledDocument();
             for(StackTraceElement ste : e.getStackTrace())
             {
@@ -90,6 +91,9 @@ public class ChecksimsInitializer extends JPanel
                 }
             }
             
+            setPanel(panel);
+            titleableFrame.repaint();
+            panel.repaint();
             titleableFrame.setTitle("Checksims Error report. Please send this to the developers");
         }
     }
@@ -103,103 +107,11 @@ public class ChecksimsInitializer extends JPanel
         UhOhException(e, null);
     }
 
-    private ChecksimsInitializer(JFrame f) throws IOException
-    {
-        this.titleableFrame = f;
-        JList<SimilarityDetector<? extends Percentable>> list =
-                new JList<SimilarityDetector<? extends Percentable>>(
-                        new Vector<SimilarityDetector<? extends Percentable>>(
-                                AlgorithmRegistry.getInstance().getSupportedImplementations())); // buy your onahole here baka!
-        checkSims = new JButton("Run CheckSims!");
-        JButton helpMode = new JButton("Enable Help");
-        
-        InputStream stream = ChecksimsInitializer.class.getResourceAsStream("/net/lldp/checksims/ui/logo.png");
-        BufferedImage logoIMG = ImageIO.read(stream);
-        JPanel logo = new JPanel() {
-            @Override
-            public void paintComponent(Graphics g) {
-                g.drawImage(logoIMG, 0, 0, null);
-            }
-        };
-        logo.setMinimumSize(new Dimension(600, 175));
-        logo.setMaximumSize(new Dimension(600, 175));
-        logo.setPreferredSize(new Dimension(600, 175));
-
-
-        JPanel selectors = new JPanel();
-        FileInputOptionAccordionList subs = new FileInputOptionAccordionList(f, selectors, FileInputType.SOURCE);
-        FileInputOptionAccordionList archs = new FileInputOptionAccordionList(f, selectors, FileInputType.ARCHIVE);
-        FileInputOptionAccordionList common = new FileInputOptionAccordionList(f, selectors, FileInputType.COMMON, FileInputOptionAccordionList.SingleInput);
-        JPanel bot = new JPanel();
-        
-        subs.setBackground(ChecksimsColors.WPI_GREY);
-        archs.setBackground(ChecksimsColors.WPI_GREY);
-        bot.setBackground(ChecksimsColors.WPI_GREY);
-
-        bot.add(checkSims);
-        bot.add(helpMode);
-        
-        helpMode.addActionListener(new ActionListener() {
-            boolean toggle = false;
-            @Override
-            public void actionPerformed(ActionEvent e)
-            {
-                toggle = !toggle;
-                for(DocumentationProvider dp : DocumentationProviderRegistry.getAll())
-                {
-                    if (toggle)
-                    {
-                        dp.enableHelpMode();
-                        helpMode.setText("Disable Help");
-                    }
-                    else
-                    {
-                        dp.disableHelpMode();
-                        helpMode.setText("Enable Help");
-                    }
-                }
-                f.revalidate();
-                f.repaint();
-            }
-        });
-        
-        JPanel UI = new JPanel();
-        selectors.setMinimumSize(new Dimension(400, 175));
-        selectors.setPreferredSize(new Dimension(400, 175));
-        selectors.setLayout(new BoxLayout(selectors, BoxLayout.Y_AXIS));
-        selectors.add(subs);
-        selectors.add(archs);
-        selectors.add(common);
-        
-        DocumentationProviderPanel algorithm = new DocumentationProviderPanel() {
-            @Override
-            public Direction getDialogDirection()
-            {
-                return Direction.EAST;
-            }
-
-            @Override
-            public String getMessageContents()
-            {
-                return "Select an Algorithm to use";
-            }
-        };
-        algorithm.setMinimumSize(new Dimension(200, 175));
-        algorithm.setPreferredSize(new Dimension(200, 175));
-        list.setMinimumSize(new Dimension(200, 175));
-        algorithm.add(list, BorderLayout.CENTER);
-        list.addMouseListener(new BubbleUpEventDispatcher(algorithm));
-        
-        UI.setLayout(new BoxLayout(UI, BoxLayout.X_AXIS));
-        UI.add(algorithm);
-        UI.add(selectors);
-
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        add(logo);
-        add(UI);
-        add(bot);
-        
-        checkSims.addActionListener(new RunChecksimsListener(this, list, subs, archs, common));
+    private ChecksimsInitializer(JFrame f) throws IOException {
+        titleableFrame = f;
+        menu = new MainMenu();
+        menuView = new MainMenuView(this, menu);
+        setPanel(menuView);
     }
     
     public static void main(String ... args) throws IOException
@@ -215,8 +127,24 @@ public class ChecksimsInitializer extends JPanel
         f.setVisible(true);
     }
 
+    public JFrame getFrame() {
+    		return this.titleableFrame;
+    }
+    
     public JFrame getWindow()
     {
         return this.titleableFrame;
+    }
+    
+    public MainMenu getMenu() {
+    		return menu;
+    }
+    
+    public void setPanel(JPanel j) {
+    		titleableFrame.setContentPane(j);
+    }
+    
+    public void goToMain() {
+    		titleableFrame.setContentPane(menuView);
     }
 }

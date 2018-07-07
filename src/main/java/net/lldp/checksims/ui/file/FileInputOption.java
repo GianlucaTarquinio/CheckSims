@@ -37,6 +37,7 @@ import net.lldp.checksims.ui.ChecksimsInitializer;
 import net.lldp.checksims.ui.buttons.FancyButtonAction;
 import net.lldp.checksims.ui.buttons.FancyButtonColorTheme;
 import net.lldp.checksims.ui.buttons.FancyButtonMouseListener;
+import net.lldp.checksims.ui.download.ChooseAccountView;
 
 /**
  * A simple UI for file picking with a cancel, view, and browse display
@@ -145,7 +146,7 @@ public class FileInputOption extends JPanel
 	    		download.addMouseListener(new FancyButtonMouseListener(download, new FancyButtonAction() {
 	        		@Override
 	        		public void performAction() {
-	        			System.out.println("HELLO THERE");
+	        			app.setPanel(new ChooseAccountView(app));
 	        		}
 	        }, FancyButtonColorTheme.BROWSE));
 	    		

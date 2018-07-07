@@ -61,6 +61,7 @@ import net.lldp.checksims.ui.lib.BubbleUpEventDispatcher;
 public class ChecksimsInitializer extends JPanel
 {
     private final JFrame titleableFrame;
+    private JPanel currentView = this;
     private MainMenu menu;
     private MainMenuView menuView;
     
@@ -92,8 +93,6 @@ public class ChecksimsInitializer extends JPanel
             }
             
             setPanel(panel);
-            titleableFrame.repaint();
-            panel.repaint();
             titleableFrame.setTitle("Checksims Error report. Please send this to the developers");
         }
     }
@@ -140,11 +139,17 @@ public class ChecksimsInitializer extends JPanel
     		return menu;
     }
     
-    public void setPanel(JPanel j) {
-    		titleableFrame.setContentPane(j);
-    }
+    public void setPanel(JPanel view) {
+		if(currentView != null){
+			titleableFrame.remove(currentView);
+		}
+		currentView = view;
+		titleableFrame.setContentPane(currentView);
+		currentView.setVisible(true);
+		titleableFrame.setVisible(true);
+	}
     
     public void goToMain() {
-    		titleableFrame.setContentPane(menuView);
+    		setPanel(menuView);
     }
 }

@@ -1,10 +1,13 @@
 package net.lldp.checksims.ui.download;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Group;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -30,31 +33,39 @@ public class ChooseAccountView extends JPanel {
 		title.setBorder(new EmptyBorder(10, 10, 10, 10));
 		header.add(title, BorderLayout.LINE_START);
 		
+		String[] services = new String[] { "canvas", "test" };//THIS IS TEMOPORARY, WILL BE READ FROM FILES
+		AccountList[] accountLists = new AccountList[services.length];
+		
 		JPanel body = new JPanel();
-		JScrollPane scroll = new JScrollPane(body);removeAll();
+		JScrollPane scroll = new JScrollPane(body);
 		scroll.setBorder(new EmptyBorder(0, 0, 0, 0));
 		body.setBackground(ChecksimsColors.PRETTY_GREY);
 		
-		GridBagConstraints c = new GridBagConstraints();
-		GridBagLayout bodyLayout = new GridBagLayout();
+		GroupLayout bodyLayout = new GroupLayout(body);
 		body.setLayout(bodyLayout);
-		c = new GridBagConstraints();
 		
-		int count = 40;
-		JLabel[] labels = new JLabel[count];
-		for(int i = 0; i < count; i++) {
-			labels[i] = new JLabel("WILL IT SCROLL???????????");
-			c.gridx = 0;
-			c.gridy = i;
-			c.weightx = 1;
-			c.weighty = 1;
-			body.add(labels[i], c);
+		Group horizontalGroup = bodyLayout.createParallelGroup();
+		Group verticalGroup = bodyLayout.createSequentialGroup();
+		
+		int height;
+		for(int i = 0; i < services.length; i++) {
+			accountLists[i] = new AccountList(app, services[i]);
+			height = accountLists[i].getMinimumSize().height;
+			horizontalGroup.addComponent(accountLists[i]);
+			verticalGroup.addComponent(accountLists[i], height, height, height);
 		}
+		
+		bodyLayout.setAutoCreateGaps(true);
+		bodyLayout.setAutoCreateContainerGaps(true);
+		
+		bodyLayout.setHorizontalGroup(horizontalGroup);
+		bodyLayout.setVerticalGroup(verticalGroup);
+		
 		
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		setLayout(gridBagLayout);
 		setBackground(ChecksimsColors.PRETTY_GREY);
-		c = new GridBagConstraints();
+		GridBagConstraints c = new GridBagConstraints();
 		
 		c.gridx = 0;
 		c.gridy = 0;

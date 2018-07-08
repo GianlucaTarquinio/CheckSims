@@ -18,12 +18,12 @@ import net.lldp.checksims.ui.buttons.FancyButtonMouseListener;
 
 public class AccountList extends JPanel {
 	private ChecksimsInitializer app;
-	private String name;
+	private Service service;
 	
-	public AccountList(ChecksimsInitializer app, String name) {
+	public AccountList(ChecksimsInitializer app, Service service) {
 		this.app = app;
-		this.name = name.toLowerCase();
-		String fileName = this.name;
+		this.service = service;
+		String name = service.getName();
 		
 		JPanel topBar = new JPanel();
 		topBar.setBackground(Color.decode("#999999"));
@@ -31,7 +31,7 @@ public class AccountList extends JPanel {
 		BorderLayout topBarLayout = new BorderLayout();
 		topBar.setLayout(topBarLayout);
 		
-		JLabel nameLabel = new JLabel(this.name.substring(0,  1).toUpperCase() + this.name.substring(1));
+		JLabel nameLabel = new JLabel(name.substring(0,  1).toUpperCase() + name.substring(1));
 		nameLabel.setFont(new Font(nameLabel.getFont().getFontName(), Font.PLAIN, 25));
 		nameLabel.setBorder(new EmptyBorder(10, 10, 10, 10));
 		topBar.add(nameLabel, BorderLayout.LINE_START);
@@ -39,10 +39,11 @@ public class AccountList extends JPanel {
 		JLabel addAccountButton = new JLabel("Add Account");
 		addAccountButton.setFont(new Font(addAccountButton.getFont().getFontName(), Font.PLAIN, 25));
 		addAccountButton.setBorder(new EmptyBorder(10, 10, 10, 10));
+		AccountList self = this;
 		addAccountButton.addMouseListener(new FancyButtonMouseListener(addAccountButton, new FancyButtonAction() {
 	    		@Override
 	    		public void performAction() {
-	    			System.out.println("add " + fileName + " account"); //TEMPORARY
+	    			self.service.onCreateNew();
 	    		}
 	    }, FancyButtonColorTheme.BROWSE));
 		topBar.add(addAccountButton, BorderLayout.LINE_END);

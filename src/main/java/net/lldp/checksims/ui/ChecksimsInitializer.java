@@ -44,6 +44,8 @@ import javax.swing.text.StyledDocument;
 import net.lldp.checksims.algorithm.AlgorithmRegistry;
 import net.lldp.checksims.algorithm.SimilarityDetector;
 import net.lldp.checksims.parse.Percentable;
+import net.lldp.checksims.ui.download.Canvas;
+import net.lldp.checksims.ui.download.Service;
 import net.lldp.checksims.ui.file.FileInputOptionAccordionList;
 import net.lldp.checksims.ui.file.FileInputType;
 import net.lldp.checksims.ui.help.Direction;
@@ -64,6 +66,7 @@ public class ChecksimsInitializer extends JPanel
     private JPanel currentView = this;
     private MainMenu menu;
     private MainMenuView menuView;
+    private final Service[] services = { new Canvas("Canvas", "canvas"), new Canvas("Canvas 2", "canvas2") };
     
     /**
      * Use this panel to show exceptions. Hide the other UI components
@@ -151,5 +154,9 @@ public class ChecksimsInitializer extends JPanel
     
     public void goToMain() {
     		setPanel(menuView);
+    }
+    
+    public Service[] getServices() {
+    		return services;
     }
 }

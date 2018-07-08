@@ -33,7 +33,7 @@ public class ChooseAccountView extends JPanel {
 		title.setBorder(new EmptyBorder(10, 10, 10, 10));
 		header.add(title, BorderLayout.LINE_START);
 		
-		String[] services = new String[] { "canvas", "test" };//THIS IS TEMOPORARY, WILL BE READ FROM FILES
+		Service[] services = app.getServices();
 		AccountList[] accountLists = new AccountList[services.length];
 		
 		JPanel body = new JPanel();

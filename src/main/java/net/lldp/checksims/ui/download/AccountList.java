@@ -9,6 +9,7 @@ import java.awt.GridBagLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 import net.lldp.checksims.ui.ChecksimsInitializer;
@@ -20,7 +21,7 @@ public class AccountList extends JPanel {
 	private ChecksimsInitializer app;
 	private Service service;
 	
-	public AccountList(ChecksimsInitializer app, Service service) {
+	public AccountList(ChecksimsInitializer app, Service service) throws Exception {
 		this.app = app;
 		this.service = service;
 		String name = service.getName();
@@ -48,7 +49,6 @@ public class AccountList extends JPanel {
 	    }, FancyButtonColorTheme.BROWSE));
 		topBar.add(addAccountButton, BorderLayout.LINE_END);
 		
-		
 		setBackground(Color.decode("#F5F5F5"));
 		
 		GridBagLayout layout = new GridBagLayout();
@@ -56,10 +56,34 @@ public class AccountList extends JPanel {
 		GridBagConstraints c = new GridBagConstraints();
 		
 		c.weightx = 1;
-		c.weighty = 1;
+		c.weighty = 1.3;
 		c.gridx = 0;
 		c.gridy = 0;
 		c.fill = GridBagConstraints.BOTH;
 		add(topBar, c);
+		
+		String[] usernames;
+		try {
+			usernames = service.getUsernames();
+		} catch(Exception e) {
+			throw e;
+		}
+
+		c.weighty = 1;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		JPanel[] listItems = new JPanel[usernames.length];
+		for(int i = 0; i < usernames.length; i++) {
+			JPanel listItem = new JPanel();
+			listItem.setLayout(new BorderLayout());
+			JLabel usernameLabel = new JLabel(usernames[i]);
+			usernameLabel.setFont(new Font(usernameLabel.getFont().getFontName(), Font.PLAIN, 17));
+			usernameLabel.setBorder(new EmptyBorder(10, 10, 10, 10));
+			listItem.add(usernameLabel, BorderLayout.LINE_START);
+			
+			c.weighty = 1;
+			c.gridy = i + 1;
+			listItems[i] = listItem;
+			add(listItems[i], c);
+		}
 	}
 }

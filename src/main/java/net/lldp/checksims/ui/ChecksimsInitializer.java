@@ -44,7 +44,7 @@ import javax.swing.text.StyledDocument;
 import net.lldp.checksims.algorithm.AlgorithmRegistry;
 import net.lldp.checksims.algorithm.SimilarityDetector;
 import net.lldp.checksims.parse.Percentable;
-import net.lldp.checksims.ui.download.Canvas;
+import net.lldp.checksims.ui.download.CanvasService;
 import net.lldp.checksims.ui.download.Service;
 import net.lldp.checksims.ui.file.FileInputOptionAccordionList;
 import net.lldp.checksims.ui.file.FileInputType;
@@ -66,7 +66,7 @@ public class ChecksimsInitializer extends JPanel
     private JPanel currentView = this;
     private MainMenu menu;
     private MainMenuView menuView;
-    private final Service[] services = { new Canvas("Canvas", "canvas"), new Canvas("Canvas 2", "canvas2") };
+    private final Service[] services = { new CanvasService(this, "Canvas", "canvas"), new CanvasService(this, "Canvas 2", "canvas2") };
     
     /**
      * Use this panel to show exceptions. Hide the other UI components
@@ -83,6 +83,13 @@ public class ChecksimsInitializer extends JPanel
             JTextPane jta = new JTextPane();
             panel.add(jta);
             StyledDocument doc = jta.getStyledDocument();
+            if(e.getMessage() != null) {
+	            try {
+	            		doc.insertString(doc.getLength(), e.getMessage() + '\n' + '\n', null);
+	            } catch(BadLocationException e1) {
+	            		e.printStackTrace();
+	            }
+            }
             for(StackTraceElement ste : e.getStackTrace())
             {
                 try

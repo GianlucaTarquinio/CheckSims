@@ -146,7 +146,11 @@ public class FileInputOption extends JPanel
 	    		download.addMouseListener(new FancyButtonMouseListener(download, new FancyButtonAction() {
 	        		@Override
 	        		public void performAction() {
-	        			app.setPanel(new ChooseAccountView(app));
+	        			try {
+	        				app.setPanel(new ChooseAccountView(app));
+	        			} catch(Exception e) {
+	        				app.UhOhException(e);
+	        			}
 	        		}
 	        }, FancyButtonColorTheme.BROWSE));
 	    		

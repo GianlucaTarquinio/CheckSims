@@ -29,7 +29,7 @@ public class ChooseAccountView extends JPanel {
 		header.setLayout(borderLayout);
 		
 		JLabel title = new JLabel("Choose Account");
-		title.setFont(new Font("Tahoma", Font.PLAIN, 40));
+		title.setFont(new Font(title.getFont().getFontName(), Font.PLAIN, 40));
 		title.setBorder(new EmptyBorder(10, 10, 10, 10));
 		header.add(title, BorderLayout.LINE_START);
 		

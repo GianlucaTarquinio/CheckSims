@@ -148,6 +148,17 @@ public class FancyButtonColorTheme
             Color.black);
     
     /**
+     * Create a colorTheme
+     * @param hb hover background
+     * @param hf hover text color
+     * @param uhb mouse away background
+     * @param uhf mouse away text color
+     * @param pb press background
+     * @param pf press text color
+     * @param upb release background
+     * @param upf release text color
+     */
+    /**
      * Nice looking stule for a browse button
      */
     public static FancyButtonColorTheme BROWSE = new FancyButtonColorTheme(
@@ -159,4 +170,14 @@ public class FancyButtonColorTheme
             Color.white,
             Color.gray,
             Color.black);
+    
+    public static FancyButtonColorTheme DELETE = new FancyButtonColorTheme(
+	    		Color.red.darker(),
+	        Color.white,
+	        Color.red,
+	        Color.white,
+	        Color.red.darker().darker(),
+	        Color.white,
+	        Color.red,
+	        Color.white);
 }

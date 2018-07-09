@@ -36,7 +36,7 @@ public class ChooseAccountView extends JPanel {
 		JLabel title = new JLabel("Choose Account");
 		title.setFont(new Font(title.getFont().getFontName(), Font.PLAIN, 40));
 		title.setBorder(new EmptyBorder(10, 10, 10, 10));
-		header.add(title, BorderLayout.LINE_START);
+		header.add(title, BorderLayout.WEST);
 		
 		int iconHeight = Math.max(title.getMinimumSize().height - 10, 1);
 		ImageIcon homeImage = new ImageIcon(new ImageIcon(getClass().getResource("/net/lldp/checksims/ui/home_icon.png")).getImage().getScaledInstance((int) Math.floor(iconHeight * 1.7778), iconHeight, Image.SCALE_SMOOTH), "Go home.");		
@@ -49,7 +49,7 @@ public class ChooseAccountView extends JPanel {
 	    			self.app.goToMain();
 	    		}
 	    }, FancyButtonColorTheme.BROWSE));
-		header.add(goHome, BorderLayout.LINE_END);
+		header.add(goHome, BorderLayout.EAST);
 		
 		Service[] services = app.getServices();
 		AccountList[] accountLists = new AccountList[services.length];
@@ -73,8 +73,9 @@ public class ChooseAccountView extends JPanel {
 				throw e;
 			}
 			height = accountLists[i].getMinimumSize().height;
+			accountLists[i].minimizePreferredSize();
 			horizontalGroup.addComponent(accountLists[i]);
-			verticalGroup.addComponent(accountLists[i], height, height, height);
+			verticalGroup.addComponent(accountLists[i], GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE);
 		}
 		
 		bodyLayout.setAutoCreateGaps(true);

@@ -2,12 +2,15 @@ package net.lldp.checksims.ui.download;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
@@ -20,6 +23,8 @@ import net.lldp.checksims.ui.buttons.FancyButtonMouseListener;
 public class AccountList extends JPanel {
 	private ChecksimsInitializer app;
 	private Service service;
+	private String[] usernames;
+	private JPanel[] listItems;
 	
 	public AccountList(ChecksimsInitializer app, Service service) throws Exception {
 		this.app = app;
@@ -35,7 +40,7 @@ public class AccountList extends JPanel {
 		JLabel nameLabel = new JLabel(name.substring(0,  1).toUpperCase() + name.substring(1));
 		nameLabel.setFont(new Font(nameLabel.getFont().getFontName(), Font.PLAIN, 25));
 		nameLabel.setBorder(new EmptyBorder(10, 10, 10, 10));
-		topBar.add(nameLabel, BorderLayout.LINE_START);
+		topBar.add(nameLabel, BorderLayout.WEST);
 		
 		JLabel addAccountButton = new JLabel("Add Account");
 		addAccountButton.setFont(new Font(addAccountButton.getFont().getFontName(), Font.PLAIN, 25));
@@ -47,7 +52,7 @@ public class AccountList extends JPanel {
 	    			self.service.onCreateNew();
 	    		}
 	    }, FancyButtonColorTheme.BROWSE));
-		topBar.add(addAccountButton, BorderLayout.LINE_END);
+		topBar.add(addAccountButton, BorderLayout.EAST);
 		
 		setBackground(Color.decode("#F5F5F5"));
 		
@@ -62,7 +67,6 @@ public class AccountList extends JPanel {
 		c.fill = GridBagConstraints.BOTH;
 		add(topBar, c);
 		
-		String[] usernames;
 		try {
 			usernames = service.getUsernames();
 		} catch(Exception e) {
@@ -71,19 +75,96 @@ public class AccountList extends JPanel {
 
 		c.weighty = 1;
 		c.fill = GridBagConstraints.HORIZONTAL;
-		JPanel[] listItems = new JPanel[usernames.length];
+		listItems = new JPanel[usernames.length];
 		for(int i = 0; i < usernames.length; i++) {
+			int index = i;
+			
 			JPanel listItem = new JPanel();
 			listItem.setLayout(new BorderLayout());
+			
 			JLabel usernameLabel = new JLabel(usernames[i]);
 			usernameLabel.setFont(new Font(usernameLabel.getFont().getFontName(), Font.PLAIN, 17));
 			usernameLabel.setBorder(new EmptyBorder(10, 10, 10, 10));
-			listItem.add(usernameLabel, BorderLayout.LINE_START);
+			listItem.add(usernameLabel, BorderLayout.WEST);
+			
+			JPanel buttonPanel = new JPanel();
+			buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+			
+			JLabel loginButton = new JLabel("Log In");
+			loginButton.setFont(new Font(loginButton.getFont().getFontName(), Font.PLAIN, 17));
+			loginButton.setBorder(new EmptyBorder(10, 10, 10, 10));
+			loginButton.addMouseListener(new FancyButtonMouseListener(loginButton, new FancyButtonAction() {
+		    		@Override
+		    		public void performAction() {
+		    			logIn(index);
+		    		}
+		    }, FancyButtonColorTheme.BROWSE));
+			buttonPanel.add(loginButton);
+			
+			JLabel deleteButton = new JLabel("Delete");
+			deleteButton.setFont(new Font(deleteButton.getFont().getFontName(), Font.PLAIN, 17));
+			deleteButton.setBorder(new EmptyBorder(10, 10, 10, 10));
+			deleteButton.addMouseListener(new FancyButtonMouseListener(deleteButton, new FancyButtonAction() {
+		    		@Override
+		    		public void performAction() {
+		    			delete(index);
+		    		}
+		    }, FancyButtonColorTheme.DELETE));
+			buttonPanel.add(deleteButton);
+			
+			listItem.add(buttonPanel, BorderLayout.EAST);
 			
 			c.weighty = 1;
 			c.gridy = i + 1;
 			listItems[i] = listItem;
 			add(listItems[i], c);
+		}
+	}
+	
+	public void minimizePreferredSize() {
+		setPreferredSize(new Dimension(getPreferredSize().width, getMinimumSize().height));
+	}
+	
+	private void logIn(int index) {
+		String data;
+		String[] info;
+		try {
+			info = service.getUserInfo(usernames[index]);
+			String input = JOptionPane.showInputDialog("Type your password for '" + usernames[index] + "'");
+			if(input == null) {
+				return;
+			}
+			data = Encryption.decrypt(info[0], input);
+		} catch(Exception e) {
+			app.UhOhException(e);
+			return;
+		}
+		if(data == null || !Encryption.scryptCheck(data, info[1])) {
+			JOptionPane.showMessageDialog(null, "The password you entered is incorrect.", "Incorrect Password", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		service.onLoggedIn(data);
+	}
+	
+	private void delete(int index) {
+		Object[] options = { "OK", "CANCEL" };
+		int result = JOptionPane.showOptionDialog(null, "Are you sure you want to permanently delete '" + usernames[index] + "' from your '" + service.getName() + "' accounts?", "Delete '" + usernames[index] + "'", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+		if(result == JOptionPane.OK_OPTION) {
+			boolean deleted;
+			try {
+				deleted = service.removeUser(usernames[index]);
+			} catch(Exception e) {
+				app.UhOhException(e);
+				return;
+			}
+			if(deleted) {
+				remove(listItems[index]);
+				revalidate();
+				minimizePreferredSize();
+				getParent().revalidate();
+			} else {
+				JOptionPane.showMessageDialog(null, "'" + usernames[index] + "' could not be deleted.", "Delete Failed", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 }

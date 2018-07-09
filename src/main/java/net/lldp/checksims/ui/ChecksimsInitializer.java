@@ -45,6 +45,7 @@ import net.lldp.checksims.algorithm.AlgorithmRegistry;
 import net.lldp.checksims.algorithm.SimilarityDetector;
 import net.lldp.checksims.parse.Percentable;
 import net.lldp.checksims.ui.download.CanvasService;
+import net.lldp.checksims.ui.download.Encryption;
 import net.lldp.checksims.ui.download.Service;
 import net.lldp.checksims.ui.file.FileInputOptionAccordionList;
 import net.lldp.checksims.ui.file.FileInputType;

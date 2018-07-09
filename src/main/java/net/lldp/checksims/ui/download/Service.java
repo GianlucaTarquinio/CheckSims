@@ -1,6 +1,7 @@
 package net.lldp.checksims.ui.download;
 
 import java.io.File;
+import java.nio.file.Files;
 
 import net.lldp.checksims.ui.ChecksimsInitializer;
 
@@ -65,12 +66,61 @@ public abstract class Service {
 			throw new Exception("Could not find '" + folderName + "' directory.");
 		}
 		
-		File[] files = folder.listFiles();
-		String[] usernames = new String[files.length];
-		for(int i = 0; i < files.length; i++) {
-			usernames[i] = files[i].getName();
+		return folder.list();
+	}
+	
+	public String[] getUserInfo(String username) throws Exception {
+		File file;
+		try {
+			file = new File(getFolderPath() + "/" + username);
+		} catch(Exception e) {
+			throw e;
 		}
-		return usernames;
+		
+		if(!(file.exists() && file.isDirectory())) {
+			throw new Exception("Could not find directory for '" + username + "'");
+		}
+		
+		File data = new File(file.getPath() + "/data");
+		File chk = new File(file.getPath() + "/chk");
+		if(!(data.exists() && data.isFile())) {
+			throw new Exception("Could not find data file for '" + username + "'");
+		}
+		if(!(chk.exists() && chk.isFile())) {
+			throw new Exception("Could not find chk file for '" + username + "'");
+		}
+		
+		return new String[] { new String(Files.readAllBytes(data.toPath())), new String(Files.readAllBytes(chk.toPath())) };
+	}
+	
+	public boolean removeUser(String username) throws Exception {
+		File file;
+		try {
+			file = new File(getFolderPath() + "/" + username);
+		} catch(Exception e) {
+			throw e;
+		}
+		
+		if(!(file.exists() && file.isDirectory())) {
+			throw new Exception("Could not find directory for '" + username + "'");
+		}
+		
+		File data = new File(file.getPath() + "/data");
+		File chk = new File(file.getPath() + "/chk");
+		if(!(data.exists() && data.isFile())) {
+			throw new Exception("Could not find data file for '" + username + "'");
+		}
+		if(!(chk.exists() && chk.isFile())) {
+			throw new Exception("Could not find chk file for '" + username + "'");
+		}
+		
+		if(!(file.canWrite() || file.getParentFile().canWrite())) {
+			return false;
+		}
+		
+		data.delete();
+		chk.delete();
+		return file.delete();
 	}
 	
 	public String getName() {

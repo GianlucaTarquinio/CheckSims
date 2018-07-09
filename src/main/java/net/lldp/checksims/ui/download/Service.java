@@ -32,7 +32,7 @@ public abstract class Service {
 		}
 	}
 	
-	public abstract void onCreateNew();
+	public abstract void onCreateNew(String username, String password);
 	
 	public abstract void onLoggedIn(String data);
 

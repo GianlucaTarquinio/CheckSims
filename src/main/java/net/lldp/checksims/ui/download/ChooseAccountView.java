@@ -1,7 +1,9 @@
 package net.lldp.checksims.ui.download;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -38,6 +40,10 @@ public class ChooseAccountView extends JPanel {
 		title.setBorder(new EmptyBorder(10, 10, 10, 10));
 		header.add(title, BorderLayout.WEST);
 		
+		JPanel topBarRight = new JPanel();
+		topBarRight.setBackground(new Color(0,0,0,0));
+		topBarRight.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		
 		int iconHeight = Math.max(title.getMinimumSize().height - 10, 1);
 		ImageIcon homeImage = new ImageIcon(new ImageIcon(getClass().getResource("/net/lldp/checksims/ui/home_icon.png")).getImage().getScaledInstance((int) Math.floor(iconHeight * 1.7778), iconHeight, Image.SCALE_SMOOTH), "Go home.");		
 		JLabel goHome = new JLabel(homeImage);
@@ -48,8 +54,10 @@ public class ChooseAccountView extends JPanel {
 	    		public void performAction() {
 	    			self.app.goToMain();
 	    		}
-	    }, FancyButtonColorTheme.BROWSE));
-		header.add(goHome, BorderLayout.EAST);
+	    }, FancyButtonColorTheme.HEADER));
+		topBarRight.add(goHome);
+		
+		header.add(topBarRight, BorderLayout.EAST);
 		
 		Service[] services = app.getServices();
 		AccountList[] accountLists = new AccountList[services.length];
@@ -68,7 +76,7 @@ public class ChooseAccountView extends JPanel {
 		int height;
 		for(int i = 0; i < services.length; i++) {
 			try {
-				accountLists[i] = new AccountList(app, services[i]);
+				accountLists[i] = new AccountList(app, this, services[i]);
 			} catch(Exception e) {
 				throw e;
 			}

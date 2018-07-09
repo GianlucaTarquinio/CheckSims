@@ -22,6 +22,8 @@ package net.lldp.checksims.ui.buttons;
 
 import java.awt.Color;
 
+import net.lldp.checksims.ui.ChecksimsColors;
+
 /**
  * Color themes for fancy buttons. These are DLC, you need to buy
  * @author ted
@@ -146,20 +148,9 @@ public class FancyButtonColorTheme
             Color.white,
             Color.gray,
             Color.black);
-    
+
     /**
-     * Create a colorTheme
-     * @param hb hover background
-     * @param hf hover text color
-     * @param uhb mouse away background
-     * @param uhf mouse away text color
-     * @param pb press background
-     * @param pf press text color
-     * @param upb release background
-     * @param upf release text color
-     */
-    /**
-     * Nice looking stule for a browse button
+     * Nice looking style for a browse button
      */
     public static FancyButtonColorTheme BROWSE = new FancyButtonColorTheme(
             Color.green.darker().darker(),
@@ -171,6 +162,23 @@ public class FancyButtonColorTheme
             Color.gray,
             Color.black);
     
+    /**
+     * Style for button in header
+     */
+    public static FancyButtonColorTheme HEADER = new FancyButtonColorTheme(
+    			ChecksimsColors.WPI_GREY.darker(),
+    			Color.black,
+    			ChecksimsColors.WPI_GREY,
+    			Color.black,
+    			ChecksimsColors.WPI_GREY.darker().darker(),
+    			Color.black,
+    			ChecksimsColors.WPI_GREY,
+    			Color.black
+    			);
+    
+    /**
+     * Style for delete button
+     */
     public static FancyButtonColorTheme DELETE = new FancyButtonColorTheme(
 	    		Color.red.darker(),
 	        Color.white,

@@ -34,6 +34,7 @@ public class FancyButtonMouseListener implements MouseListener
 {
     private final FancyButtonAction action;
     private final FancyButtonColorTheme colors;
+    private boolean pressed = false;
     
     /**
      * @param on the component to turn in
@@ -51,7 +52,7 @@ public class FancyButtonMouseListener implements MouseListener
     @Override
     public void mouseClicked(MouseEvent me)
     {
-        action.performAction();
+        
     }
 
     @Override
@@ -66,6 +67,7 @@ public class FancyButtonMouseListener implements MouseListener
     @Override
     public void mouseExited(MouseEvent me)
     {
+    		pressed = false;
         JComponent c = (JComponent) me.getSource();
         c.setForeground(colors.getUnhoverFont());
         c.setBackground(colors.getUnhoverBackground());
@@ -75,6 +77,7 @@ public class FancyButtonMouseListener implements MouseListener
     @Override
     public void mousePressed(MouseEvent me)
     {
+    		pressed = true;
         JComponent c = (JComponent) me.getSource();
         c.setBackground(colors.getPressBackground());
         c.setForeground(colors.getPressFont());
@@ -86,6 +89,9 @@ public class FancyButtonMouseListener implements MouseListener
         JComponent c = (JComponent) me.getSource();
         c.setBackground(colors.getUnhoverBackground());
         c.setForeground(colors.getUnhoverFont());
+        if(pressed) {
+        		action.performAction();
+        }
     }
 
 }

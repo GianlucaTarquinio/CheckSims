@@ -8,8 +8,8 @@ public class CanvasService extends Service {
 	}
 	
 	@Override
-	public void onCreateNew() {
-		System.out.println("make a new " + name + " account"); //TEMPORARY
+	public void onCreateNew(String username, String password) {
+		System.out.println("make a new account called '" + username + "' with password '" + password + "'"); //TEMPORARY
 	}
 
 	@Override

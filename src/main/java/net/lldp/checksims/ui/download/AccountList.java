@@ -12,6 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
@@ -22,12 +23,14 @@ import net.lldp.checksims.ui.buttons.FancyButtonMouseListener;
 
 public class AccountList extends JPanel {
 	private ChecksimsInitializer app;
+	private ChooseAccountView chooseAccountView;
 	private Service service;
 	private String[] usernames;
 	private JPanel[] listItems;
 	
-	public AccountList(ChecksimsInitializer app, Service service) throws Exception {
+	public AccountList(ChecksimsInitializer app, ChooseAccountView cav, Service service) throws Exception {
 		this.app = app;
+		chooseAccountView = cav;
 		this.service = service;
 		String name = service.getName();
 		
@@ -49,11 +52,10 @@ public class AccountList extends JPanel {
 		addAccountButton.addMouseListener(new FancyButtonMouseListener(addAccountButton, new FancyButtonAction() {
 	    		@Override
 	    		public void performAction() {
-	    			self.service.onCreateNew();
+	    			app.setPanel(new CreateAccountView(app, chooseAccountView, service));
 	    		}
 	    }, FancyButtonColorTheme.BROWSE));
 		topBar.add(addAccountButton, BorderLayout.EAST);
-		
 		setBackground(Color.decode("#F5F5F5"));
 		
 		GridBagLayout layout = new GridBagLayout();
@@ -76,48 +78,55 @@ public class AccountList extends JPanel {
 		c.weighty = 1;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		listItems = new JPanel[usernames.length];
-		for(int i = 0; i < usernames.length; i++) {
-			int index = i;
-			
-			JPanel listItem = new JPanel();
-			listItem.setLayout(new BorderLayout());
-			
-			JLabel usernameLabel = new JLabel(usernames[i]);
-			usernameLabel.setFont(new Font(usernameLabel.getFont().getFontName(), Font.PLAIN, 17));
-			usernameLabel.setBorder(new EmptyBorder(10, 10, 10, 10));
-			listItem.add(usernameLabel, BorderLayout.WEST);
-			
-			JPanel buttonPanel = new JPanel();
-			buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
-			
-			JLabel loginButton = new JLabel("Log In");
-			loginButton.setFont(new Font(loginButton.getFont().getFontName(), Font.PLAIN, 17));
-			loginButton.setBorder(new EmptyBorder(10, 10, 10, 10));
-			loginButton.addMouseListener(new FancyButtonMouseListener(loginButton, new FancyButtonAction() {
-		    		@Override
-		    		public void performAction() {
-		    			logIn(index);
-		    		}
-		    }, FancyButtonColorTheme.BROWSE));
-			buttonPanel.add(loginButton);
-			
-			JLabel deleteButton = new JLabel("Delete");
-			deleteButton.setFont(new Font(deleteButton.getFont().getFontName(), Font.PLAIN, 17));
-			deleteButton.setBorder(new EmptyBorder(10, 10, 10, 10));
-			deleteButton.addMouseListener(new FancyButtonMouseListener(deleteButton, new FancyButtonAction() {
-		    		@Override
-		    		public void performAction() {
-		    			delete(index);
-		    		}
-		    }, FancyButtonColorTheme.DELETE));
-			buttonPanel.add(deleteButton);
-			
-			listItem.add(buttonPanel, BorderLayout.EAST);
-			
-			c.weighty = 1;
-			c.gridy = i + 1;
-			listItems[i] = listItem;
-			add(listItems[i], c);
+		if(usernames.length == 0) {
+			c.gridy = 1;
+			JLabel emptyMessage = new JLabel("You have no " + service.getName() + " accounts.");
+			emptyMessage.setFont(new Font(emptyMessage.getFont().getFontName(), Font.PLAIN, 14));
+			emptyMessage.setBorder(new EmptyBorder(10, 10, 10, 10));
+			add(emptyMessage, c);
+		} else {
+			for(int i = 0; i < usernames.length; i++) {
+				int index = i;
+				
+				JPanel listItem = new JPanel();
+				listItem.setLayout(new BorderLayout());
+				
+				JLabel usernameLabel = new JLabel(usernames[i]);
+				usernameLabel.setFont(new Font(usernameLabel.getFont().getFontName(), Font.PLAIN, 17));
+				usernameLabel.setBorder(new EmptyBorder(10, 10, 10, 10));
+				listItem.add(usernameLabel, BorderLayout.WEST);
+				
+				JPanel buttonPanel = new JPanel();
+				buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+				
+				JLabel loginButton = new JLabel("Log In");
+				loginButton.setFont(new Font(loginButton.getFont().getFontName(), Font.PLAIN, 17));
+				loginButton.setBorder(new EmptyBorder(10, 10, 10, 10));
+				loginButton.addMouseListener(new FancyButtonMouseListener(loginButton, new FancyButtonAction() {
+			    		@Override
+			    		public void performAction() {
+			    			logIn(index);
+			    		}
+			    }, FancyButtonColorTheme.BROWSE));
+				buttonPanel.add(loginButton);
+				
+				JLabel deleteButton = new JLabel("Delete");
+				deleteButton.setFont(new Font(deleteButton.getFont().getFontName(), Font.PLAIN, 17));
+				deleteButton.setBorder(new EmptyBorder(10, 10, 10, 10));
+				deleteButton.addMouseListener(new FancyButtonMouseListener(deleteButton, new FancyButtonAction() {
+			    		@Override
+			    		public void performAction() {
+			    			delete(index);
+			    		}
+			    }, FancyButtonColorTheme.DELETE));
+				buttonPanel.add(deleteButton);
+				
+				listItem.add(buttonPanel, BorderLayout.EAST);
+				
+				c.gridy = i + 1;
+				listItems[i] = listItem;
+				add(listItems[i], c);
+			}
 		}
 	}
 	
@@ -130,7 +139,7 @@ public class AccountList extends JPanel {
 		String[] info;
 		try {
 			info = service.getUserInfo(usernames[index]);
-			String input = JOptionPane.showInputDialog("Type your password for '" + usernames[index] + "'");
+			String input = JOptionPane.showInputDialog("Type the password for '" + usernames[index] + "'");
 			if(input == null) {
 				return;
 			}
@@ -141,9 +150,9 @@ public class AccountList extends JPanel {
 		}
 		if(data == null || !Encryption.scryptCheck(data, info[1])) {
 			JOptionPane.showMessageDialog(null, "The password you entered is incorrect.", "Incorrect Password", JOptionPane.ERROR_MESSAGE);
-			return;
+		} else {
+			service.onLoggedIn(data);
 		}
-		service.onLoggedIn(data);
 	}
 	
 	private void delete(int index) {

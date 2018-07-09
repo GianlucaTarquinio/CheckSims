@@ -63,6 +63,11 @@ import net.lldp.checksims.ui.lib.BubbleUpEventDispatcher;
  */
 public class ChecksimsInitializer extends JPanel
 {
+	public final static int MIN_USERNAME_LEN = 1;
+	public final static int MAX_USERNAME_LEN = 30;
+	public final static int MIN_PASSWORD_LEN = 5;
+	public final static int MAX_PASSWORD_LEN = 100;
+	
     private final JFrame titleableFrame;
     private JPanel currentView = this;
     private MainMenu menu;
@@ -134,6 +139,7 @@ public class ChecksimsInitializer extends JPanel
         f.setLayout(new GridLayout(1, 1));
         f.add(new ChecksimsInitializer(f));
         f.pack();
+        f.setLocationRelativeTo(null);
         f.setVisible(true);
     }
 

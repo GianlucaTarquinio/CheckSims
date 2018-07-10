@@ -151,7 +151,10 @@ public class AccountList extends JPanel {
 		if(data == null || !Encryption.scryptCheck(data, info[1])) {
 			JOptionPane.showMessageDialog(null, "The password you entered is incorrect.", "Incorrect Password", JOptionPane.ERROR_MESSAGE);
 		} else {
-			service.onLoggedIn(data);
+			String error = service.onLoggedIn(data);
+			if(error != null) {
+				JOptionPane.showMessageDialog(null, error, "Log In Failed.", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 	

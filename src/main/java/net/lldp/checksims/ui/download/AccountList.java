@@ -8,10 +8,12 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JSeparator;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
@@ -138,12 +140,30 @@ public class AccountList extends JPanel {
 		String data;
 		String[] info;
 		try {
-			info = service.getUserInfo(usernames[index]);
-			String input = JOptionPane.showInputDialog("Type the password for '" + usernames[index] + "'");
-			if(input == null) {
+			JPanel inputPanel = new JPanel();
+			inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
+			
+			JLabel passwordLabel = new JLabel("Type the password for '" + usernames[index] + "'");
+			passwordLabel.setAlignmentX(LEFT_ALIGNMENT);
+			inputPanel.add(passwordLabel);
+			
+			JPasswordField passwordField = new JPasswordField(ChecksimsInitializer.MAX_USERNAME_LEN);
+			passwordField.setAlignmentX(LEFT_ALIGNMENT);
+			inputPanel.add(passwordField);
+			
+			String[] options = new String[]{ "OK", "Cancel" };
+			int option = JOptionPane.showOptionDialog(null, inputPanel, "Log In To " + service.getName(), JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+			if(option != 0) {
 				return;
+			} 
+			
+			char[] pass = passwordField.getPassword();
+			if(pass.length == 0) {
+				JOptionPane.showMessageDialog(null, "The password you entered is incorrect.", "Incorrect Password", JOptionPane.ERROR_MESSAGE);
 			}
-			data = Encryption.decrypt(info[0], input);
+			
+			info = service.getUserInfo(usernames[index]);
+			data = Encryption.decrypt(info[0], new String(pass));
 		} catch(Exception e) {
 			app.UhOhException(e);
 			return;
@@ -151,17 +171,14 @@ public class AccountList extends JPanel {
 		if(data == null || !Encryption.scryptCheck(data, info[1])) {
 			JOptionPane.showMessageDialog(null, "The password you entered is incorrect.", "Incorrect Password", JOptionPane.ERROR_MESSAGE);
 		} else {
-			String error = service.onLoggedIn(data);
-			if(error != null) {
-				JOptionPane.showMessageDialog(null, error, "Log In Failed.", JOptionPane.ERROR_MESSAGE);
-			}
+			service.onLoggedIn(usernames[index], data);
 		}
 	}
 	
 	private void delete(int index) {
-		Object[] options = { "OK", "CANCEL" };
-		int result = JOptionPane.showOptionDialog(null, "Are you sure you want to permanently delete '" + usernames[index] + "' from your '" + service.getName() + "' accounts?", "Delete '" + usernames[index] + "'", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
-		if(result == JOptionPane.OK_OPTION) {
+		Object[] options = { "OK", "Cancel" };
+		int result = JOptionPane.showOptionDialog(null, "Are you sure you want to permanently delete '" + usernames[index] + "' from your '" + service.getName() + "' accounts?", "Delete '" + usernames[index] + "'", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
+		if(result == 0) {
 			boolean deleted;
 			try {
 				deleted = service.removeUser(usernames[index]);

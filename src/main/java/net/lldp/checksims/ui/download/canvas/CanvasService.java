@@ -8,8 +8,10 @@ import java.io.FileOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 
 import javax.json.Json;
+import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.swing.JOptionPane;
@@ -126,6 +128,7 @@ public class CanvasService extends Service {
 		String chk = Encryption.scrypt(refreshToken);
 		try {
 			addUser(username, data, chk);
+			app.setPanel(new CanvasSubmissionBrowser(app, this, username));
 		} catch(Exception e) {
 			throw e;
 		}
@@ -164,24 +167,170 @@ public class CanvasService extends Service {
 		accessToken = response.getString("access_token");
 	}
 	
+	public Course[] getCanvasData() {
+		Course[] courses = getTeacherAndTACourses();
+		for(Course c : courses) {
+			c.setAssignments(getAssignments(c.getId()));
+			for(Assignment a : c.getAssignments()) {
+				a.setSubmissions(getSubmissions(c.getId(), a.getId()));
+			}
+		}
+		return courses;
+	}
+	
+	private Course[] getTeacherAndTACourses() {
+		Course[] taCourses = getCourses("ta");
+		Course[] teacherCourses = getCourses("teacher");
+		
+		HashMap<String, Course> duplicateMap = new HashMap<String, Course>();
+		for(Course c : taCourses) {
+			duplicateMap.put(c.getUuid(), c);
+		}
+		for(Course c : teacherCourses) {
+			duplicateMap.put(c.getUuid(), c);
+		}
+		return duplicateMap.values().toArray(new Course[0]);
+	}
+	
+	private Course[] getCourses(String type) {
+		int status = 0;
+		JsonArray courses;
+		try {
+			URL url = new URL(baseUrl + "/api/v1/courses?enrollment_type=" + type);
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			con.setRequestMethod("GET");
+			setAuthHeader(con);
+			status = con.getResponseCode();
+			JsonReader jr = Json.createReader(con.getInputStream());
+			courses = jr.readArray();
+		} catch(Exception e) {
+			if(status == 401) {
+				if(authFailed) {
+					authFailed = false;
+					handleAuthFailure();
+					return new Course[0];
+				}
+				authFailed = true;
+				try {
+					refreshAuth();
+				} catch(Exception e1) {
+					handleAuthFailure();
+				}
+				return getCourses(type);
+			}
+			e.printStackTrace();
+			return new Course[0];
+		}
+		JsonObject course;
+		int len = courses.size();
+		Course result[] = new Course[len];
+		for(int i = 0; i < len; i++) {
+			course = (JsonObject) courses.get(i);
+			result[i] = new Course(course.getInt("id"), course.getString("name"), course.getString("uuid"));
+		}
+		return result;
+	}
+	
+	private Assignment[] getAssignments(int courseId) {
+		int status = 0;
+		JsonArray assignments;
+		try {
+			URL url = new URL(baseUrl + "/api/v1/courses/" + courseId + "/assignments");
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			con.setRequestMethod("GET");
+			setAuthHeader(con);
+			status = con.getResponseCode();
+			JsonReader jr = Json.createReader(con.getInputStream());
+			assignments = jr.readArray();
+		} catch(Exception e) {
+			if(status == 401) {
+				if(authFailed) {
+					authFailed = false;
+					handleAuthFailure();
+					return new Assignment[0];
+				}
+				authFailed = true;
+				try {
+					refreshAuth();
+				} catch(Exception e1) {
+					handleAuthFailure();
+				}
+				return getAssignments(courseId);
+			}
+			e.printStackTrace();
+			return new Assignment[0];
+		}
+		JsonObject assignment;
+		int len = assignments.size();
+		Assignment result[] = new Assignment[len];
+		for(int i = 0; i < len; i++) {
+			assignment = (JsonObject) assignments.get(i);
+			result[i] = new Assignment(assignment.getInt("id"), assignment.getString("name"));
+		}
+		return result;
+	}
+	
+	private Submission[] getSubmissions(int courseId, int assignmentId) {
+		int status = 0;
+		JsonArray submissions;
+		try {
+			URL url = new URL(baseUrl + "/api/v1/courses/" + courseId + "/assignments/" + assignmentId + "/submissions");
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			con.setRequestMethod("GET");
+			setAuthHeader(con);
+			status = con.getResponseCode();
+			JsonReader jr = Json.createReader(con.getInputStream());
+			submissions = jr.readArray();
+		} catch(Exception e) {
+			if(status == 401) {
+				if(authFailed) {
+					authFailed = false;
+					handleAuthFailure();
+					return new Submission[0];
+				}
+				authFailed = true;
+				try {
+					refreshAuth();
+				} catch(Exception e1) {
+					handleAuthFailure();
+				}
+				return getSubmissions(courseId, assignmentId);
+			}
+			e.printStackTrace();
+			return new Submission[0];
+		}
+		JsonObject submission;
+		int len = submissions.size();
+		Submission result[] = new Submission[len];
+		for(int i = 0; i < len; i++) {
+			submission = (JsonObject) submissions.get(i);
+			result[i] = new Submission(submission.getInt("id"), submission.getInt("user_id"), submission.getJsonArray("attachments"));
+		}
+		return result;
+	}
+	
+	private void handleAuthFailure() {
+		JOptionPane.showMessageDialog(null, "This is most likely a temporary problem with Canvas.", "Authentication Failed", JOptionPane.ERROR_MESSAGE);
+	}
+	
 	@Override
 	public void onCreateNew(String username, String password) {
 		startOAuth(username, password);
 	}
 
 	@Override
-	public String onLoggedIn(String data) {
+	public void onLoggedIn(String username, String data) {
 		refreshToken = data;
 		try {
 			refreshAuth();
 		} catch(Exception e) {
-			String message = e.getMessage();
-			if(message == null) {
+			String error = e.getMessage();
+			if(error == null) {
 				e.printStackTrace();
-				return "Your accuont was not created.";
+				error = "Your accuont was not created.";
 			}
-			return message;
+			JOptionPane.showMessageDialog(null, error, "Log In Failed.", JOptionPane.ERROR_MESSAGE);
 		}
-		return null;
+		app.setPanel(new CanvasSubmissionBrowser(app, this, username));
 	}
 }

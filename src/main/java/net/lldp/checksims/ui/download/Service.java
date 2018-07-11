@@ -34,7 +34,7 @@ public abstract class Service {
 	
 	public abstract void onCreateNew(String username, String password);
 	
-	public abstract String onLoggedIn(String data);
+	public abstract void onLoggedIn(String username, String data);
 
 	public String getAccountsFolderPath() throws Exception {
 		try {

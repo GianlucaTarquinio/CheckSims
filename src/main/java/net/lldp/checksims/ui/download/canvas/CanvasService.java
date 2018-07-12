@@ -128,7 +128,7 @@ public class CanvasService extends Service {
 		String chk = Encryption.scrypt(refreshToken);
 		try {
 			addUser(username, data, chk);
-			app.setPanel(new CanvasSubmissionBrowser(app, this, username));
+			showSubmissionBrowser(username);
 		} catch(Exception e) {
 			throw e;
 		}
@@ -313,6 +313,12 @@ public class CanvasService extends Service {
 		JOptionPane.showMessageDialog(null, "This is most likely a temporary problem with Canvas.", "Authentication Failed", JOptionPane.ERROR_MESSAGE);
 	}
 	
+	public void showSubmissionBrowser(String username) {
+		CanvasSubmissionBrowser csb = new CanvasSubmissionBrowser(app, this, username);
+		app.setPanel(csb);
+		csb.load();
+	}
+	
 	@Override
 	public void onCreateNew(String username, String password) {
 		startOAuth(username, password);
@@ -327,10 +333,10 @@ public class CanvasService extends Service {
 			String error = e.getMessage();
 			if(error == null) {
 				e.printStackTrace();
-				error = "Your accuont was not created.";
+				error = "Your accuont may not have been created.";
 			}
 			JOptionPane.showMessageDialog(null, error, "Log In Failed.", JOptionPane.ERROR_MESSAGE);
 		}
-		app.setPanel(new CanvasSubmissionBrowser(app, this, username));
+		showSubmissionBrowser(username);
 	}
 }

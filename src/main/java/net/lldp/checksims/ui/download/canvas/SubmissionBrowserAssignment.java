@@ -19,10 +19,12 @@ import net.lldp.checksims.ui.buttons.FancyButtonMouseListener;
 public class SubmissionBrowserAssignment extends JPanel {
 	ChecksimsInitializer app;
 	Assignment assignment;
+	CanvasSubmissionBrowser csb;
 	
-	public SubmissionBrowserAssignment(ChecksimsInitializer app, Assignment assignment) {
+	public SubmissionBrowserAssignment(ChecksimsInitializer app, CanvasSubmissionBrowser csb, Assignment assignment) {
 		this.app = app;
 		this.assignment = assignment;
+		this.csb = csb;
 		
 		setLayout(new BorderLayout());
 		setBackground(Color.decode("#F5F5F5"));
@@ -37,10 +39,11 @@ public class SubmissionBrowserAssignment extends JPanel {
 		ImageIcon downloadImage = new ImageIcon(new ImageIcon(getClass().getResource("/net/lldp/checksims/ui/download_icon.png")).getImage().getScaledInstance(height, height, Image.SCALE_SMOOTH), "Download");		
 		JLabel downloadButton = new JLabel(downloadImage);
 		downloadButton.setBorder(new EmptyBorder(10, 10, 10, 10));
+		SubmissionBrowserAssignment self = this;
 		downloadButton.addMouseListener(new FancyButtonMouseListener(downloadButton, new FancyButtonAction() {
 	    		@Override
 	    		public void performAction() {
-	    			System.out.println("Download submissions for " + assignment.getName());
+	    			self.assignment.downloadSubmissions(app, csb);
 	    		}
 	    }, FancyButtonColorTheme.BROWSE));
 		add(downloadButton, BorderLayout.EAST);

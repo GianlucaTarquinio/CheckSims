@@ -26,10 +26,12 @@ public class SubmissionBrowserCourse extends JPanel {
 	JLabel expandButton, collapseButton;
 	JPanel coursePanel;
 	JPanel assignmentPanel;
+	CanvasSubmissionBrowser csb;
 	
-	public SubmissionBrowserCourse(ChecksimsInitializer app, Course course) {
+	public SubmissionBrowserCourse(ChecksimsInitializer app, CanvasSubmissionBrowser csb, Course course) {
 		this.app = app;
 		this.course = course;
+		this.csb = csb;
 		
 		coursePanel = new JPanel();
 		coursePanel.setLayout(new BorderLayout());
@@ -103,7 +105,7 @@ public class SubmissionBrowserCourse extends JPanel {
 		
 		SubmissionBrowserAssignment sba;
 		for(Assignment a : course.getAssignments()) {
-			sba = new SubmissionBrowserAssignment(app, a);
+			sba = new SubmissionBrowserAssignment(app, csb, a);
 			sba.minimizePreferredSize();			
 			horizontalGroup.addComponent(sba);
 			verticalGroup.addComponent(sba, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE);

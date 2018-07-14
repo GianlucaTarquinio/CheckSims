@@ -27,6 +27,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Vector;
@@ -67,6 +68,7 @@ public class ChecksimsInitializer extends JPanel
 	public final static int MAX_USERNAME_LEN = 30;
 	public final static int MIN_PASSWORD_LEN = 5;
 	public final static int MAX_PASSWORD_LEN = 100;
+	public final static File DEFAULT_DOWNLOAD_PATH = new File(".");
 	
     private final JFrame titleableFrame;
     private JPanel currentView = this;

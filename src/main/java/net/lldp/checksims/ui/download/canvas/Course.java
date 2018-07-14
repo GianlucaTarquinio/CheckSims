@@ -5,6 +5,7 @@ public class Course {
 	private String name;
 	private String uuid;
 	private Assignment[] assignments;
+	private CanvasSubmissionBrowser csb;
 	
 	public Course(int id, String name, String uuid) {
 		this.id = id;

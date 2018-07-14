@@ -132,7 +132,7 @@ public class CanvasSubmissionBrowser extends JPanel {
 		
 		SubmissionBrowserCourse sbc;
 		for(Course c : courses) {
-			sbc = new SubmissionBrowserCourse(app, c);
+			sbc = new SubmissionBrowserCourse(app, this, c);
 			sbc.minimizePreferredSize();			
 			horizontalGroup.addComponent(sbc);
 			verticalGroup.addComponent(sbc, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE);
@@ -142,19 +142,5 @@ public class CanvasSubmissionBrowser extends JPanel {
 		bodyLayout.setVerticalGroup(verticalGroup);
 		
 		body.revalidate();
-	}
-	
-	private String buildDataString(Course[] courses) {
-		String data = "";
-		for(Course c : courses) {
-			data += c.toString() + '\n';
-			for(Assignment a : c.getAssignments()) {
-				data += '\t' + a.toString() + '\n';
-				for(Submission s : a.getSubmissions()) {
-					data += "\t\t" + s.toString() + '\n';
-				}
-			}
-		}
-		return data.substring(0, data.length() - 1);
 	}
 }

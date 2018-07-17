@@ -40,6 +40,17 @@ public class TurninConverter {
 		}
 	}
 	
+	public static void delete(File file) {
+		if(file.isDirectory()) {
+			for(File f : file.listFiles()) {
+				delete(f);
+			}
+			file.delete();
+		} else {
+			file.delete();
+		}
+	}
+	
 	private static void format(File start, File end, File code, String[] suffixes) throws Exception {
 		if(start.isDirectory()) {
 			for(File f : start.listFiles()) {

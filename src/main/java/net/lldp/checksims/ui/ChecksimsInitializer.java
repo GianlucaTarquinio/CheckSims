@@ -69,6 +69,7 @@ public class ChecksimsInitializer extends JPanel
 	public final static int MIN_PASSWORD_LEN = 5;
 	public final static int MAX_PASSWORD_LEN = 100;
 	public final static File DEFAULT_DOWNLOAD_PATH = new File("downloads");
+	public final static File TEMPORARY_DOWNLOAD_PATH = new File(".temp");
 	public final static String DEFAULT_CODE_SUFFIXES = ".java, .c, .h, .cpp, .py, .py3";
 	
     private final JFrame titleableFrame;

@@ -1,5 +1,8 @@
 package net.lldp.checksims.ui.download.canvas;
 
+import java.awt.Component;
+import java.awt.Font;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.nio.channels.Channels;
@@ -8,16 +11,23 @@ import java.time.ZonedDateTime;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.border.EmptyBorder;
 
 public class Submission {
 	private int id;
-	private int user_id;
+	private int userId;
 	private JsonArray attachments;
+	private CanvasService canvasService;
 	
-	public Submission(int id, int user_id, JsonArray attachments) {
+	public Submission(int id, int userId, JsonArray attachments, CanvasService canvasService) {
 		this.id = id;
-		this.user_id = user_id;
+		this.userId = userId;
 		this.attachments = attachments;
+		this.canvasService = canvasService;
 	}
 	
 	public void downloadAttachments(String dirPath) {
@@ -35,6 +45,17 @@ public class Submission {
 		}
 	}
 	
+	public void download(File from, File to, String suffix) {
+		//make the dir for this submission
+		//download to temp
+		//format to to
+		try {
+			Thread.sleep(2000);
+		} catch(Exception e) {
+			return;
+		}
+	}
+	
 	public int getId() {
 		return id;
 	}
@@ -43,12 +64,16 @@ public class Submission {
 		this.id = id;
 	}
 	
-	public int getUser_id() {
-		return user_id;
+	public int getUserId() {
+		return userId;
 	}
 	
-	public void setUser_id(int user_id) {
-		this.user_id = user_id;
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
+	
+	public String getName() {
+		return canvasService.getUserName(userId);
 	}
 	
 	public JsonArray getAttachments() {
@@ -61,6 +86,6 @@ public class Submission {
 	
 	@Override
 	public String toString() {
-		return "Submission [id=" + id + ", user_id=" + user_id + "]";
+		return "Submission [id=" + id + ", userId=" + userId + "]";
 	}
 }

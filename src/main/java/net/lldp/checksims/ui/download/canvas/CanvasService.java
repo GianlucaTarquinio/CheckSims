@@ -304,9 +304,41 @@ public class CanvasService extends Service {
 		Submission result[] = new Submission[len];
 		for(int i = 0; i < len; i++) {
 			submission = (JsonObject) submissions.get(i);
-			result[i] = new Submission(submission.getInt("id"), submission.getInt("user_id"), submission.getJsonArray("attachments"));
+			result[i] = new Submission(submission.getInt("id"), submission.getInt("user_id"), submission.getJsonArray("attachments"), this);
 		}
 		return result;
+	}
+	
+	public String getUserName(int userId) {
+		int status = 0;
+		JsonObject user;
+		try {
+			URL url = new URL(baseUrl + "/api/v1/users/" + userId);
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			con.setRequestMethod("GET");
+			setAuthHeader(con);
+			status = con.getResponseCode();
+			JsonReader jr = Json.createReader(con.getInputStream());
+			user = jr.readObject();
+		} catch(Exception e) {
+			if(status == 401) {
+				if(authFailed) {
+					authFailed = false;
+					handleAuthFailure();
+					return null;
+				}
+				authFailed = true;
+				try {
+					refreshAuth();
+				} catch(Exception e1) {
+					handleAuthFailure();
+				}
+				return getUserName(userId);
+			}
+			e.printStackTrace();
+			return null;
+		}
+		return user.getString("name");
 	}
 	
 	private void handleAuthFailure() {

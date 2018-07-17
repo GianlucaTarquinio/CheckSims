@@ -5,6 +5,9 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.File;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -13,16 +16,20 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JProgressBar;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import net.lldp.checksims.ui.ChecksimsInitializer;
+import net.lldp.checksims.ui.download.TurninConverter;
 
 public class Assignment {
 	private int id;
 	private String name;
 	private Submission[] submissions;
+	private boolean downloaded = false;
+	private boolean open = false;
 	
 	public Assignment(int id, String name) {
 		this.id = id;
@@ -71,11 +78,99 @@ public class Assignment {
 		if(option != 0) {
 			return;
 		}
-		System.out.println("Download as: " + dcp.getName());
-		System.out.println("Download to: " + dcp.getPath());
-		System.out.println("Suffixes: " + dcp.getSuffixes());
-		//check the dialog
-		//download the submissions
+		String folderName = dcp.getName();
+		if(folderName == null || folderName.length() == 0) {
+			JOptionPane.showMessageDialog(null, "Must provide a name.", "No Name", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		String path = dcp.getPath();
+		if(path == null || path.length() == 0) {
+			JOptionPane.showMessageDialog(null, "Must provide a path.", "No Path", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		String suffixes = dcp.getSuffixes();
+		
+		File from = ChecksimsInitializer.TEMPORARY_DOWNLOAD_PATH;
+		if(from.exists()) {
+			if(!from.isDirectory()) {
+				JOptionPane.showMessageDialog(null, "'" + from.getAbsolutePath() + "' already exists, and is not a directory.", "File Already Exists", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			TurninConverter.delete(from);
+		}
+		
+		if(!from.mkdirs()) {
+			JOptionPane.showMessageDialog(null, "'" + from.getAbsolutePath() + "' could not be created.", "File Not Created", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		File to = new File(path + "/" + folderName);
+		if(to.exists()) {
+			if(!to.isDirectory()) {
+				JOptionPane.showMessageDialog(null, "'" + to.getAbsolutePath() + "' already exists, and is not a directory.", "File Already Exists", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+		} else {
+			to.mkdirs();
+		}
+
+		DownloadProgress downloadProgress = new DownloadProgress(app.getFrame(), submissions.length, this);
+		open = true;
+		downloadProgress.addWindowListener(new WindowListener() {
+			@Override
+			public void windowOpened(WindowEvent e) {
+				//Do nothing
+			}
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+				//Do nothing
+			}
+
+			@Override
+			public void windowClosed(WindowEvent e) {
+				open = false;
+				TurninConverter.delete(ChecksimsInitializer.TEMPORARY_DOWNLOAD_PATH);
+				if(downloaded) {
+					downloaded = false;
+					System.out.println("Download succeeded");
+				} else {
+					TurninConverter.delete(to);
+					JOptionPane.showMessageDialog(null, "Your download has been canceleld.", "Download Cancelled", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+
+			@Override
+			public void windowIconified(WindowEvent e) {
+				//Do nothing
+			}
+
+			@Override
+			public void windowDeiconified(WindowEvent e) {
+				//Do nothing
+			}
+
+			@Override
+			public void windowActivated(WindowEvent e) {
+				//Do nothing
+			}
+
+			@Override
+			public void windowDeactivated(WindowEvent e) {
+				//Do nothing
+			}
+		});
+		
+		int i = 0;
+		downloadProgress.set(0);
+		while(open && i < submissions.length) {
+			submissions[i].download(from, to, suffixes);
+			downloadProgress.set(++i);
+		}
+	}
+	
+	public void setDownloaded() {
+		downloaded = true;
 	}
 	
 	@Override

@@ -68,13 +68,14 @@ public class ChecksimsInitializer extends JPanel
 	public final static int MAX_USERNAME_LEN = 30;
 	public final static int MIN_PASSWORD_LEN = 5;
 	public final static int MAX_PASSWORD_LEN = 100;
-	public final static File DEFAULT_DOWNLOAD_PATH = new File(".");
+	public final static File DEFAULT_DOWNLOAD_PATH = new File("downloads");
+	public final static String DEFAULT_CODE_SUFFIXES = ".java, .c, .h, .cpp, .py, .py3";
 	
     private final JFrame titleableFrame;
     private JPanel currentView = this;
     private MainMenu menu;
     private MainMenuView menuView;
-    private final Service[] services = { new CanvasService(this, "Canvas", "canvas"), new CanvasService(this, "Canvas 2", "canvas2") };
+    private final Service[] services = { new CanvasService(this, "Canvas", "canvas") };
     
     /**
      * Use this panel to show exceptions. Hide the other UI components

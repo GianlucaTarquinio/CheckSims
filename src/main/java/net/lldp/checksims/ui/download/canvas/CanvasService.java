@@ -22,7 +22,7 @@ import net.lldp.checksims.ui.download.Service;
 
 public class CanvasService extends Service {
 	public static String id = "77820000000000045";
-	private static String secret = "ttrQKCNzVTOw9KXYOfj0JAkpBFzZvg2ODjO6XWSRxiupI6rzFq2xojnpP1N34t6V";
+	private static String secret = "KCbQMnCaaFjocc2XC8JwMWwZqJ2n3IVfueA0Lzz0I0I7YGD1ekPxWG7mM2Ei1LL1";
 	
 	public static String baseUrl = "https://wpi.test.instructure.com";
 	

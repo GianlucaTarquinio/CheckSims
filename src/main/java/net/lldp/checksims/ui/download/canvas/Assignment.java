@@ -2,6 +2,7 @@ package net.lldp.checksims.ui.download.canvas;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -12,6 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
@@ -53,49 +55,25 @@ public class Assignment {
 	}
 	
 	public void downloadSubmissions(ChecksimsInitializer app, CanvasSubmissionBrowser csb) {
-		//build the dialog
-		JPanel configPanel = new JPanel();
-		configPanel.setLayout(new BoxLayout(configPanel, BoxLayout.Y_AXIS));
-		
-		JLabel pathLabel = new JLabel("Download path");
-		
-		JFileChooser path = new JFileChooser();
-		path.setCurrentDirectory(ChecksimsInitializer.DEFAULT_DOWNLOAD_PATH);
-		path.setDialogTitle("Choose a download path");
-		path.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		path.setAcceptAllFileFilterUsed(false);
-		
-		JTextField pathField = new JTextField(80);
-		pathField.setEditable(false);
-		pathField.setText(path.getCurrentDirectory().getAbsolutePath());
-		pathField.setBorder(new EmptyBorder(10, 10, 10, 10));
-		
-		JButton pathButton = new JButton("Browse");
-		Assignment self = this;
-		pathButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(path.showOpenDialog(csb) == JFileChooser.APPROVE_OPTION) {
-					System.out.println(path.getSelectedFile());
-				}
+		char[] safeName = name.toCharArray();
+		char c;
+		for(int i = 0; i < safeName.length; i++) {
+			c = safeName[i];
+			if(!(Character.isLetter(c) || Character.isDigit(c))) {
+				safeName[i] = '_';
+			} else if(Character.isUpperCase(c)) {
+				safeName[i] = Character.toLowerCase(c);
 			}
-			
-		});
-		
-		JPanel pathPanel = new JPanel();
-		pathPanel.setLayout(new BorderLayout());
-		
-		pathPanel.add(pathLabel, BorderLayout.WEST);
-		pathPanel.add(pathButton, BorderLayout.EAST);
-		pathPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-		
-		configPanel.add(pathPanel);
-		//bring up the dialog
-		String[] options = new String[]{ "OK", "Cancel" };
-		int option = JOptionPane.showOptionDialog(null, pathPanel, "Configure Download", JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+		}
+		DownloadConfigPanel dcp = new DownloadConfigPanel(csb, new String(safeName) + "_submissions");
+		String[] options = new String[]{ "Download", "Cancel" };
+		int option = JOptionPane.showOptionDialog(null, dcp, "Configure Download", JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
 		if(option != 0) {
-			System.out.println("Download to " + path.getSelectedFile());
-		} 
+			return;
+		}
+		System.out.println("Download as: " + dcp.getName());
+		System.out.println("Download to: " + dcp.getPath());
+		System.out.println("Suffixes: " + dcp.getSuffixes());
 		//check the dialog
 		//download the submissions
 	}

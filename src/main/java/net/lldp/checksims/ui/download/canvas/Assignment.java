@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 
 import javax.swing.BoxLayout;
@@ -19,6 +21,8 @@ import javax.swing.JPasswordField;
 import javax.swing.JProgressBar;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ProgressMonitor;
+import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
 
 import net.lldp.checksims.ui.ChecksimsInitializer;
@@ -28,8 +32,26 @@ public class Assignment {
 	private int id;
 	private String name;
 	private Submission[] submissions;
-	private boolean downloaded = false;
-	private boolean open = false;
+	private File from, to;
+	private String suffixes;
+	private ProgressMonitor progressMonitor;
+	
+	public class DownloadTask extends SwingWorker<Void, Void> {		
+		@Override
+		protected Void doInBackground() throws Exception {
+			int i = 0;
+			setProgress(1);
+			while(i < submissions.length && !progressMonitor.isCanceled()) {
+				try {
+					submissions[i].download(from, to, suffixes);
+				} catch(Exception e) {
+					return null;
+				}
+				setProgress(++i + 1);
+			}
+			return null;
+		}
+	}
 	
 	public Assignment(int id, String name) {
 		this.id = id;
@@ -58,7 +80,12 @@ public class Assignment {
 	}
 	
 	public void setSubmissions(Submission[] submissions) {
-		this.submissions = submissions;
+		this.submissions = new Submission[submissions.length * 3];
+		for(int i = 0; i < submissions.length; i++) {
+			for(int j = 0; j < 3; j++) {
+				this.submissions[i*j + j] = submissions[i];
+			}
+		}
 	}
 	
 	public void downloadSubmissions(ChecksimsInitializer app, CanvasSubmissionBrowser csb) {
@@ -88,9 +115,9 @@ public class Assignment {
 			JOptionPane.showMessageDialog(null, "Must provide a path.", "No Path", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		String suffixes = dcp.getSuffixes();
+		suffixes = dcp.getSuffixes();
 		
-		File from = ChecksimsInitializer.TEMPORARY_DOWNLOAD_PATH;
+		from = ChecksimsInitializer.TEMPORARY_DOWNLOAD_PATH;
 		if(from.exists()) {
 			if(!from.isDirectory()) {
 				JOptionPane.showMessageDialog(null, "'" + from.getAbsolutePath() + "' already exists, and is not a directory.", "File Already Exists", JOptionPane.ERROR_MESSAGE);
@@ -104,7 +131,14 @@ public class Assignment {
 			return;
 		}
 		
-		File to = new File(path + "/" + folderName);
+		File toParent = new File(path);
+		toParent.mkdirs();
+		try {
+			to = new File(TurninConverter.getUnusedName(toParent, folderName));
+		} catch(Exception e) {
+			JOptionPane.showMessageDialog(null, "Could not create destination directory.", "File Not Created", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 		if(to.exists()) {
 			if(!to.isDirectory()) {
 				JOptionPane.showMessageDialog(null, "'" + to.getAbsolutePath() + "' already exists, and is not a directory.", "File Already Exists", JOptionPane.ERROR_MESSAGE);
@@ -114,63 +148,33 @@ public class Assignment {
 			to.mkdirs();
 		}
 
-		DownloadProgress downloadProgress = new DownloadProgress(app.getFrame(), submissions.length, this);
-		open = true;
-		downloadProgress.addWindowListener(new WindowListener() {
-			@Override
-			public void windowOpened(WindowEvent e) {
-				//Do nothing
-			}
-
-			@Override
-			public void windowClosing(WindowEvent e) {
-				//Do nothing
-			}
-
-			@Override
-			public void windowClosed(WindowEvent e) {
-				open = false;
-				TurninConverter.delete(ChecksimsInitializer.TEMPORARY_DOWNLOAD_PATH);
-				if(downloaded) {
-					downloaded = false;
-					System.out.println("Download succeeded");
-				} else {
-					TurninConverter.delete(to);
-					JOptionPane.showMessageDialog(null, "Your download has been canceleld.", "Download Cancelled", JOptionPane.ERROR_MESSAGE);
-				}
-			}
-
-			@Override
-			public void windowIconified(WindowEvent e) {
-				//Do nothing
-			}
-
-			@Override
-			public void windowDeiconified(WindowEvent e) {
-				//Do nothing
-			}
-
-			@Override
-			public void windowActivated(WindowEvent e) {
-				//Do nothing
-			}
-
-			@Override
-			public void windowDeactivated(WindowEvent e) {
-				//Do nothing
-			}
-		});
+		progressMonitor = new ProgressMonitor(csb, "Downloading Submissions", "Starting download", 0, submissions.length + 1);
+		progressMonitor.setMillisToPopup(0);
+		progressMonitor.setMillisToDecideToPopup(0);
 		
-		int i = 0;
-		downloadProgress.set(0);
-		while(open && i < submissions.length) {
-			submissions[i].download(from, to, suffixes);
-			downloadProgress.set(++i);
-		}
-	}
-	
-	public void setDownloaded() {
-		downloaded = true;
+		DownloadTask download = new DownloadTask();
+		download.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				if(evt.getPropertyName().equals("progress")) {
+					int progress = (Integer) evt.getNewValue();
+					progressMonitor.setProgress(progress);
+					progressMonitor.setNote("Downloaded " + (progress - 1) + "/" + submissions.length);
+					if(progressMonitor.isCanceled() || download.isDone()) {
+						if(progressMonitor.isCanceled()) {
+							download.cancel(true);
+							TurninConverter.delete(from);
+							TurninConverter.delete(to);
+							JOptionPane.showMessageDialog(null, "Your download has been cancelled.", "Download Cancelled", JOptionPane.ERROR_MESSAGE);
+						} else {
+							TurninConverter.delete(from);
+							System.out.println("Download completed");
+						}
+					}
+				}
+			}		
+		});
+		download.execute();
 	}
 	
 	@Override

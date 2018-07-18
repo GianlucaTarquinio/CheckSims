@@ -14,18 +14,16 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 
 public class TurninConverter {
-	public static void formatSubmission(String from, String to, String suffixes) throws Exception {
-		File start = new File(from);
-		if(!start.exists()) {
-			throw new Exception("'" + from + "' does not exist.");
+	public static void formatSubmission(File from, File to, String suffixes) throws Exception {
+		if(!from.exists()) {
+			throw new Exception("'" + from.getAbsolutePath() + "' does not exist.");
 		}
 		
-		File end = new File(to);
-		if(end.exists()) {
-			throw new Exception("'" + to + "' already exists.");
+		if(!to.exists()) {
+			throw new Exception("'" + to.getAbsolutePath() + "' already exists.");
 		}
 		
-		File code = new File(to + "/code");
+		File code = new File(to.getPath() + "/code");
 		code.mkdirs();
 		
 		String[] suffixList = suffixes.split(",");
@@ -34,7 +32,7 @@ public class TurninConverter {
 		}
 		
 		try {
-			format(start, end, code, suffixList);
+			format(from, to, code, suffixList);
 		} catch(Exception e) {
 			throw e;
 		}
@@ -119,7 +117,7 @@ public class TurninConverter {
 		}
 	}
 	
-	private static String getUnusedName(File folder, String base) throws Exception {		
+	public static String getUnusedName(File folder, String base) throws Exception {		
 		String[] nameList;
 		try {
 			nameList = folder.list();

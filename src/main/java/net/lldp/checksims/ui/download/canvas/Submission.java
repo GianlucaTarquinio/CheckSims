@@ -17,6 +17,8 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.border.EmptyBorder;
 
+import net.lldp.checksims.ui.download.TurninConverter;
+
 public class Submission {
 	private int id;
 	private int userId;
@@ -37,7 +39,7 @@ public class Submission {
 				JsonObject a = (JsonObject) jv;
 				URL url = new URL(a.getString("url"));
 				ReadableByteChannel rbc = Channels.newChannel(url.openStream());
-				FileOutputStream fos = new FileOutputStream(dirPath +"/" + a.getString("uuid") + "_" + a.getString("display_name"));
+				FileOutputStream fos = new FileOutputStream(dirPath + "/" + a.getString("display_name"));
 				fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
 			} catch(Exception e) {
 				e.printStackTrace();
@@ -45,14 +47,36 @@ public class Submission {
 		}
 	}
 	
-	public void download(File from, File to, String suffix) {
-		//make the dir for this submission
-		//download to temp
-		//format to to
+	public void download(File from, File to, String suffixes) throws Exception {
+		char[] safeName = getName().toCharArray();
+		char c;
+		for(int i = 0; i < safeName.length; i++) {
+			c = safeName[i];
+			if(!(Character.isLetter(c) || Character.isDigit(c))) {
+				safeName[i] = '_';
+			} else if(Character.isUpperCase(c)) {
+				safeName[i] = Character.toLowerCase(c);
+			}
+		}
+		String folderName = new String(safeName);
+		File toFolder;
 		try {
-			Thread.sleep(2000);
+			toFolder = new File(TurninConverter.getUnusedName(to, folderName));
 		} catch(Exception e) {
-			return;
+			throw e;
+		}
+		if(!toFolder.mkdirs()) {
+			throw new Exception("Could not make directory: '" + toFolder.getAbsolutePath() + "'");
+		}
+		File fromFolder = new File(from.getPath() + "/" + "submission");
+		if(!fromFolder.mkdirs()) {
+			throw new Exception("Could not make directory: '" + fromFolder.getAbsolutePath() + "'");
+		}
+		downloadAttachments(fromFolder.getPath());
+		try {
+			TurninConverter.formatSubmission(fromFolder, toFolder, suffixes);
+		} catch(Exception e) {
+			throw e;
 		}
 	}
 	

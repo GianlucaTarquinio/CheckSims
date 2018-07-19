@@ -43,7 +43,7 @@ public class SubmissionBrowserAssignment extends JPanel {
 		downloadButton.addMouseListener(new FancyButtonMouseListener(downloadButton, new FancyButtonAction() {
 	    		@Override
 	    		public void performAction() {
-	    			self.assignment.downloadSubmissions(app, csb);
+	    			self.assignment.downloadSubmissions(self.app, self.csb);
 	    		}
 	    }, FancyButtonColorTheme.BROWSE));
 		add(downloadButton, BorderLayout.EAST);

@@ -68,7 +68,7 @@ public class MainMenuView extends JPanel {
 	    }
         FileInputOptionAccordionList common = new FileInputOptionAccordionList(app, selectors, FileInputType.COMMON, FileInputOptionAccordionList.SingleInput);
         for(AccordionListEntry e : menu.getEntrys(FileInputType.COMMON)) {
-	    		archs.addFIO(e.getID(), e.getPath(), FileInputType.COMMON);
+	    		common.addFIO(e.getID(), e.getPath(), FileInputType.COMMON);
 	    }
         JPanel bot = new JPanel();
         

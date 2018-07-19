@@ -80,12 +80,7 @@ public class Assignment {
 	}
 	
 	public void setSubmissions(Submission[] submissions) {
-		this.submissions = new Submission[submissions.length * 3];
-		for(int i = 0; i < submissions.length; i++) {
-			for(int j = 0; j < 3; j++) {
-				this.submissions[i*j + j] = submissions[i];
-			}
-		}
+		this.submissions = submissions;
 	}
 	
 	public void downloadSubmissions(ChecksimsInitializer app, CanvasSubmissionBrowser csb) {
@@ -168,7 +163,8 @@ public class Assignment {
 							JOptionPane.showMessageDialog(null, "Your download has been cancelled.", "Download Cancelled", JOptionPane.ERROR_MESSAGE);
 						} else {
 							TurninConverter.delete(from);
-							System.out.println("Download completed");
+							app.getMenu().setCurrentFIOPath(to.getAbsolutePath());
+							app.goToMain();
 						}
 					}
 				}

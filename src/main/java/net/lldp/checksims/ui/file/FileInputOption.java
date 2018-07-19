@@ -147,6 +147,7 @@ public class FileInputOption extends JPanel
 	        		@Override
 	        		public void performAction() {
 	        			try {
+	        				app.getMenu().setCurrentFIO(self);
 	        				app.setPanel(new ChooseAccountView(app));
 	        			} catch(Exception e) {
 	        				app.UhOhException(e);

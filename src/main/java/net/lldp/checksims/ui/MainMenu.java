@@ -2,11 +2,13 @@ package net.lldp.checksims.ui;
 
 import java.util.ArrayList;
 
+import net.lldp.checksims.ui.file.FileInputOption;
 import net.lldp.checksims.ui.file.FileInputType;
 
 public class MainMenu {
 	private ArrayList<AccordionListEntry> sourceEntrys, archiveEntrys, commonEntrys;
 	private long nextSourceId, nextArchiveId, nextCommonId;
+	private FileInputOption currentFIO;
 	
 	public MainMenu() {
 		sourceEntrys = new ArrayList<AccordionListEntry>();
@@ -15,6 +17,7 @@ public class MainMenu {
 		nextSourceId = 0;
 		nextArchiveId = 0;
 		nextCommonId = 0;
+		this.currentFIO = null;
 	}
 	
 	public void addEntry(AccordionListEntry entry, FileInputType type) {
@@ -102,5 +105,15 @@ public class MainMenu {
 			return nextCommonId;
 		}
 		return 0;
+	}
+	
+	public void setCurrentFIO(FileInputOption fio) {
+		currentFIO = fio;
+	}
+	
+	public void setCurrentFIOPath(String path) {
+		if(currentFIO != null) {
+			currentFIO.setPath(path);
+		}
 	}
 }

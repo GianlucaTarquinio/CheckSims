@@ -1,7 +1,9 @@
 package net.lldp.checksims.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,12 +16,18 @@ import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
 import net.lldp.checksims.algorithm.AlgorithmRegistry;
 import net.lldp.checksims.algorithm.SimilarityDetector;
 import net.lldp.checksims.parse.Percentable;
+import net.lldp.checksims.ui.buttons.FancyButtonAction;
+import net.lldp.checksims.ui.buttons.FancyButtonColorTheme;
+import net.lldp.checksims.ui.buttons.FancyButtonMouseListener;
+import net.lldp.checksims.ui.download.Service;
 import net.lldp.checksims.ui.file.FileInputOptionAccordionList;
 import net.lldp.checksims.ui.file.FileInputType;
 import net.lldp.checksims.ui.help.Direction;
@@ -31,6 +39,9 @@ import net.lldp.checksims.ui.lib.BubbleUpEventDispatcher;
 public class MainMenuView extends JPanel {
 	ChecksimsInitializer app;
 	MainMenu menu;
+	JPanel sessionPanel = null;
+	JLabel usernameLabel = null;
+	JLabel logOutButton = null;
 	
 	public MainMenuView(ChecksimsInitializer a, MainMenu m) throws IOException {
 		app = a;
@@ -132,12 +143,50 @@ public class MainMenuView extends JPanel {
         UI.setLayout(new BoxLayout(UI, BoxLayout.X_AXIS));
         UI.add(algorithm);
         UI.add(selectors);
-
+        
+        sessionPanel = new JPanel();
+        sessionPanel.setLayout(new BorderLayout());
+        sessionPanel.setBackground(ChecksimsColors.PRETTY_GREY);
+        
+        usernameLabel = new JLabel("HELLO");
+        usernameLabel.setFont(new Font(usernameLabel.getFont().getFontName(), Font.PLAIN, 13));
+        usernameLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
+        
+        logOutButton = new JLabel("Log Out");
+        logOutButton.setFont(new Font(logOutButton.getFont().getFontName(), Font.PLAIN, 13));
+        logOutButton.setBorder(new EmptyBorder(5, 5, 5, 5));
+        MainMenuView self = this;
+        logOutButton.addMouseListener(new FancyButtonMouseListener(logOutButton, new FancyButtonAction() {
+	    		@Override
+	    		public void performAction() {
+	    			self.app.setSessionUsername(null);
+	    			self.app.setSessionService(null);
+	    			updateSessionPanel();
+	    		}
+	    }, FancyButtonColorTheme.BROWSE));
+        
+        sessionPanel.add(usernameLabel, BorderLayout.WEST);
+        sessionPanel.add(logOutButton, BorderLayout.EAST);
+        sessionPanel.setVisible(false);
+        
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        add(sessionPanel);
         add(logo);
         add(UI);
         add(bot);
         
         checkSims.addActionListener(new RunChecksimsListener(app, list, subs, archs, common));
+	}
+	
+	public void updateSessionPanel() {
+		String username = app.getSessionUsername();
+		Service service = app.getSessionService();
+		if(username == null || service == null) {
+			sessionPanel.setVisible(false);
+			usernameLabel.setText("");
+		} else {
+			usernameLabel.setText("Logged in as: " + username + " (" + service.getName() + ")");
+			sessionPanel.setVisible(true);
+		}
 	}
 }

@@ -2,23 +2,17 @@ package net.lldp.checksims.ui.download.canvas;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.GroupLayout.Group;
 import javax.swing.border.EmptyBorder;
 
@@ -28,17 +22,18 @@ import net.lldp.checksims.ui.buttons.FancyButtonAction;
 import net.lldp.checksims.ui.buttons.FancyButtonColorTheme;
 import net.lldp.checksims.ui.buttons.FancyButtonMouseListener;
 import net.lldp.checksims.ui.download.ChooseAccountView;
-import net.lldp.checksims.ui.download.CreateAccountView;
 
 public class CanvasSubmissionBrowser extends JPanel {
-	ChecksimsInitializer app;
-	CanvasService canvasService;
-	Course[] courses;
-	JPanel body = null;
+	private ChecksimsInitializer app;
+	private CanvasService canvasService;
+	private Course[] courses;
+	private JPanel body = null;
+	private boolean fromMain;
 	
-	public CanvasSubmissionBrowser(ChecksimsInitializer app, CanvasService canvasService, String username) {
+	public CanvasSubmissionBrowser(ChecksimsInitializer app, CanvasService canvasService, String username, boolean fromMain) {
 		this.app = app;
 		this.canvasService = canvasService;
+		this.fromMain = fromMain;
 		
 		JPanel topBar = new JPanel();
 		topBar.setBackground(ChecksimsColors.WPI_GREY);
@@ -62,9 +57,13 @@ public class CanvasSubmissionBrowser extends JPanel {
 	    		@Override
 	    		public void performAction() {
 	    			try {
-	    				self.app.setSessionUsername(null);
-	    				self.app.setSessionService(null);
-	    				self.app.setPanel(new ChooseAccountView(self.app));
+	    				if(self.fromMain) {
+	    					self.app.goToMain();
+	    				} else {
+		    				self.app.setSessionUsername(null);
+		    				self.app.setSessionService(null);
+		    				self.app.setPanel(new ChooseAccountView(self.app));
+	    				}
 	    			} catch(Exception e) {
 	    				self.app.UhOhException(e);
 	    			}

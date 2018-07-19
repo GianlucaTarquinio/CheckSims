@@ -128,7 +128,7 @@ public class CanvasService extends Service {
 		String chk = Encryption.scrypt(refreshToken);
 		try {
 			addUser(username, data, chk);
-			showSubmissionBrowser(username);
+			showSubmissionBrowser(username, false);
 		} catch(Exception e) {
 			throw e;
 		}
@@ -345,10 +345,10 @@ public class CanvasService extends Service {
 		JOptionPane.showMessageDialog(null, "This is most likely a temporary problem with Canvas.", "Authentication Failed", JOptionPane.ERROR_MESSAGE);
 	}
 	
-	public void showSubmissionBrowser(String username) {
+	public void showSubmissionBrowser(String username, boolean fromMain) {
 		app.setSessionUsername(username);
 		app.setSessionService(this);
-		CanvasSubmissionBrowser csb = new CanvasSubmissionBrowser(app, this, username);
+		CanvasSubmissionBrowser csb = new CanvasSubmissionBrowser(app, this, username, fromMain);
 		app.setPanel(csb);
 		csb.load();
 	}
@@ -371,11 +371,11 @@ public class CanvasService extends Service {
 			}
 			JOptionPane.showMessageDialog(null, error, "Log In Failed.", JOptionPane.ERROR_MESSAGE);
 		}
-		showSubmissionBrowser(username);
+		showSubmissionBrowser(username, false);
 	}
 	
 	@Override
 	public void onReused(String username) {
-		showSubmissionBrowser(username);
+		showSubmissionBrowser(username, true);
 	}
 }

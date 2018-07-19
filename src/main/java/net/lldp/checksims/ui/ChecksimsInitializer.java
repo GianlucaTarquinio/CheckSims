@@ -152,6 +152,7 @@ public class ChecksimsInitializer extends JPanel
 	}
     
     public void goToMain() {
+    		menuView.updateSessionPanel();
     		setPanel(menuView);
     }
     

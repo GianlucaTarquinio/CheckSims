@@ -62,6 +62,8 @@ public class CanvasSubmissionBrowser extends JPanel {
 	    		@Override
 	    		public void performAction() {
 	    			try {
+	    				self.app.setSessionUsername(null);
+	    				self.app.setSessionService(null);
 	    				self.app.setPanel(new ChooseAccountView(self.app));
 	    			} catch(Exception e) {
 	    				self.app.UhOhException(e);

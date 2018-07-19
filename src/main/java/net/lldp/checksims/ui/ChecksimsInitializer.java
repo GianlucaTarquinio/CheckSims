@@ -20,41 +20,19 @@
  */
 package net.lldp.checksims.ui;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Vector;
 
-import javax.imageio.ImageIO;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.StyledDocument;
 
-import net.lldp.checksims.algorithm.AlgorithmRegistry;
-import net.lldp.checksims.algorithm.SimilarityDetector;
-import net.lldp.checksims.parse.Percentable;
-import net.lldp.checksims.ui.download.Encryption;
 import net.lldp.checksims.ui.download.Service;
 import net.lldp.checksims.ui.download.canvas.CanvasService;
-import net.lldp.checksims.ui.file.FileInputOptionAccordionList;
-import net.lldp.checksims.ui.file.FileInputType;
-import net.lldp.checksims.ui.help.Direction;
-import net.lldp.checksims.ui.help.DocumentationProvider;
-import net.lldp.checksims.ui.help.DocumentationProviderPanel;
-import net.lldp.checksims.ui.help.DocumentationProviderRegistry;
-import net.lldp.checksims.ui.lib.BubbleUpEventDispatcher;
 
 /**
  * 
@@ -68,9 +46,12 @@ public class ChecksimsInitializer extends JPanel
 	public final static int MAX_USERNAME_LEN = 30;
 	public final static int MIN_PASSWORD_LEN = 5;
 	public final static int MAX_PASSWORD_LEN = 100;
-	public final static File DEFAULT_DOWNLOAD_PATH = new File("downloads");
+	public final static File DEFAULT_DOWNLOAD_PATH = new File(System.getProperty("user.home") + "/checksims/downloads");
 	public final static File TEMPORARY_DOWNLOAD_PATH = new File(".temp");
 	public final static String DEFAULT_CODE_SUFFIXES = ".java, .c, .h, .cpp, .py, .py3";
+	
+	private String sessionUsername = null;
+	private Service sessionService = null;
 	
     private final JFrame titleableFrame;
     private JPanel currentView = this;
@@ -177,4 +158,20 @@ public class ChecksimsInitializer extends JPanel
     public Service[] getServices() {
     		return services;
     }
+    
+    public String getSessionUsername() {
+		return sessionUsername;
+	}
+
+	public void setSessionUsername(String sessionUsername) {
+		this.sessionUsername = sessionUsername;
+	}
+    
+    public Service getSessionService() {
+		return sessionService;
+	}
+
+	public void setSessionService(Service sessionService) {
+		this.sessionService = sessionService;
+	}
 }

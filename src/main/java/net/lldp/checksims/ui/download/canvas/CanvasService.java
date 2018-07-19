@@ -346,6 +346,8 @@ public class CanvasService extends Service {
 	}
 	
 	public void showSubmissionBrowser(String username) {
+		app.setSessionUsername(username);
+		app.setSessionService(this);
 		CanvasSubmissionBrowser csb = new CanvasSubmissionBrowser(app, this, username);
 		app.setPanel(csb);
 		csb.load();
@@ -369,6 +371,11 @@ public class CanvasService extends Service {
 			}
 			JOptionPane.showMessageDialog(null, error, "Log In Failed.", JOptionPane.ERROR_MESSAGE);
 		}
+		showSubmissionBrowser(username);
+	}
+	
+	@Override
+	public void onReused(String username) {
 		showSubmissionBrowser(username);
 	}
 }

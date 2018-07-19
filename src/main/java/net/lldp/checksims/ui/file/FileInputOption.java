@@ -38,6 +38,7 @@ import net.lldp.checksims.ui.buttons.FancyButtonAction;
 import net.lldp.checksims.ui.buttons.FancyButtonColorTheme;
 import net.lldp.checksims.ui.buttons.FancyButtonMouseListener;
 import net.lldp.checksims.ui.download.ChooseAccountView;
+import net.lldp.checksims.ui.download.Service;
 
 /**
  * A simple UI for file picking with a cancel, view, and browse display
@@ -147,8 +148,14 @@ public class FileInputOption extends JPanel
 	        		@Override
 	        		public void performAction() {
 	        			try {
+	        				String username = app.getSessionUsername();
+	        				Service service = app.getSessionService();
 	        				app.getMenu().setCurrentFIO(self);
-	        				app.setPanel(new ChooseAccountView(app));
+	        				if(username == null || service == null) {
+	        					app.setPanel(new ChooseAccountView(app));
+	        				} else {
+	        					service.onReused(username);
+	        				}
 	        			} catch(Exception e) {
 	        				app.UhOhException(e);
 	        			}

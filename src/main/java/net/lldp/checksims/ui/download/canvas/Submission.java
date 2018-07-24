@@ -41,6 +41,7 @@ public class Submission {
 				ReadableByteChannel rbc = Channels.newChannel(url.openStream());
 				FileOutputStream fos = new FileOutputStream(dirPath + "/" + a.getString("display_name"));
 				fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+				fos.close();
 			} catch(Exception e) {
 				e.printStackTrace();
 			}

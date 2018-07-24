@@ -121,7 +121,7 @@ public class SubmissionBrowserCourse extends JPanel {
 		assignmentPanel.setVisible(true);
 		revalidate();
 		minimizePreferredSize();
-		repaint();
+		getParent().revalidate();
 	}
 	
 	private void collapse() {

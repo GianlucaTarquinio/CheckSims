@@ -43,10 +43,9 @@ public class TurninConverter {
 			for(File f : file.listFiles()) {
 				delete(f);
 			}
-			file.delete();
-		} else {
-			file.delete();
 		}
+		file.setWritable(true);
+		file.delete();
 	}
 	
 	private static void format(File start, File end, File code, String[] suffixes) throws Exception {
@@ -58,9 +57,7 @@ public class TurninConverter {
 					throw e;
 				}
 			}
-			if(!start.delete()) {
-				throw new Exception("Could not delete '" + start.getAbsolutePath() + "'");
-			}
+			delete(start);
 		} else {
 			String name = start.getName();
 			if(name.endsWith(".zip")) {
@@ -69,7 +66,7 @@ public class TurninConverter {
 					File toFolder = new File(getUnusedName(start.getParentFile(), folderName));
 					toFolder.mkdir();
 					unzip(start, toFolder);
-					start.delete();
+					delete(start);
 					format(toFolder, end, code, suffixes);
 				} catch(Exception e) {
 					throw e;
@@ -80,7 +77,7 @@ public class TurninConverter {
 					File toFolder = new File(getUnusedName(start.getParentFile(), folderName));
 					toFolder.mkdir();
 					untar(start, toFolder);
-					start.delete();
+					delete(start);
 					format(toFolder, end, code, suffixes);
 				} catch(Exception e) {
 					throw e;
@@ -90,7 +87,7 @@ public class TurninConverter {
 					String fileName = name.substring(0, (int) (name.length() - 3));
 					File toFile = new File(getUnusedName(start.getParentFile(), fileName));
 					ungz(start, toFile);
-					start.delete();
+					delete(start);
 					format(toFile, end, code, suffixes);
 				} catch(Exception e) {
 					throw e;

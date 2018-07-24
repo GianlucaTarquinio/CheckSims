@@ -45,6 +45,7 @@ public class Assignment {
 				try {
 					submissions[i].download(from, to, suffixes);
 				} catch(Exception e) {
+					e.printStackTrace();
 					return null;
 				}
 				setProgress(++i + 1);
@@ -146,7 +147,7 @@ public class Assignment {
 		progressMonitor = new ProgressMonitor(csb, "Downloading Submissions", "Starting download", 0, submissions.length + 1);
 		progressMonitor.setMillisToPopup(0);
 		progressMonitor.setMillisToDecideToPopup(0);
-		
+				
 		DownloadTask download = new DownloadTask();
 		download.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override

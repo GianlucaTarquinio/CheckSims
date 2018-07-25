@@ -20,7 +20,7 @@ public class TurninConverter {
 		}
 		
 		if(!to.exists()) {
-			throw new Exception("'" + to.getAbsolutePath() + "' already exists.");
+			throw new Exception("'" + to.getAbsolutePath() + "' does not exist.");
 		}
 		
 		File code = new File(to.getPath() + "/code");

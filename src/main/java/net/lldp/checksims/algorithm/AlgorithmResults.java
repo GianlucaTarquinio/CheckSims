@@ -28,6 +28,8 @@ import net.lldp.checksims.submission.Submission;
 import net.lldp.checksims.util.data.Real;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Set;
+
 /**
  * Results for a pairwise comparison algorithm.
  */
@@ -129,6 +131,18 @@ public class AlgorithmResults {
         checkNotNull(b);
         
         return a.equals(b);
+    }
+    
+    public boolean includes(Set<Submission> subs) {
+    		checkNotNull(a);
+        checkNotNull(b);
+        
+        for(Submission s : subs) {
+        		if(a.equals(s) || b.equals(s)) {
+        			return true;
+        		}
+        }
+    		return false;
     }
 
     public AlgorithmResults inverse()

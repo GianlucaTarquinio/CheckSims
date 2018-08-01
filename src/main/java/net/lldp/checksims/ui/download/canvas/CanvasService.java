@@ -21,10 +21,10 @@ import net.lldp.checksims.ui.download.Encryption;
 import net.lldp.checksims.ui.download.Service;
 
 public class CanvasService extends Service {
-	public static String id = "77820000000000045";
-	private static String secret = "KCbQMnCaaFjocc2XC8JwMWwZqJ2n3IVfueA0Lzz0I0I7YGD1ekPxWG7mM2Ei1LL1";
+	public static String id = "77820000000000013";
+	private static String secret = "T6XJ0NTAbP2ooeBHj64jNRUGETN59JIw14DCfTFADcKKakbLPFgwhbB1fYtCtpRM";
 	
-	public static String baseUrl = "https://wpi.test.instructure.com";
+	public static String baseUrl = "https://canvas.wpi.edu";
 	
 	private String authCode = null;
 	private String accessToken = null;
@@ -99,7 +99,7 @@ public class CanvasService extends Service {
 		try {
 			String params = "grant_type=authorization_code&client_id=" + id + "&client_secret=" + secret + "&redirect_uri=urn:ietf:wg:oauth:2.0:oob&code=" + code;
 			byte[] data = params.getBytes(StandardCharsets.UTF_8);
-			URL url = new URL("https://wpi.test.instructure.com/login/oauth2/token");
+			URL url = new URL(baseUrl + "/login/oauth2/token");
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("POST");
 			con.setRequestProperty( "Content-Type", "application/x-www-form-urlencoded");
@@ -144,7 +144,7 @@ public class CanvasService extends Service {
 		try {
 			String params = "grant_type=refresh_token&client_id=" + id + "&client_secret=" + secret + "&refresh_token=" + refreshToken;
 			byte[] data = params.getBytes(StandardCharsets.UTF_8);
-			URL url = new URL("https://wpi.test.instructure.com/login/oauth2/token");
+			URL url = new URL(baseUrl + "/login/oauth2/token");
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("POST");
 			con.setRequestProperty( "Content-Type", "application/x-www-form-urlencoded");

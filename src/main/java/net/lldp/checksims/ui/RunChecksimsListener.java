@@ -43,8 +43,10 @@ import net.lldp.checksims.ChecksimsConfig;
 import net.lldp.checksims.ChecksimsException;
 import net.lldp.checksims.ChecksimsRunner;
 import net.lldp.checksims.algorithm.SimilarityDetector;
+import net.lldp.checksims.algorithm.linesimilarity.LineSimilarityChecker;
 import net.lldp.checksims.algorithm.preprocessor.SubmissionPreprocessor;
 import net.lldp.checksims.algorithm.similaritymatrix.output.MatrixPrinter;
+import net.lldp.checksims.algorithm.smithwaterman.SmithWaterman;
 import net.lldp.checksims.parse.Percentable;
 import net.lldp.checksims.ui.file.FileInputOptionAccordionList;
 import net.lldp.checksims.ui.results.GraphicalMatrixPrinter;
@@ -98,6 +100,7 @@ public class RunChecksimsListener implements ActionListener
                     
                     //TODO check conditions!
                     final ChecksimsConfig conf = new ChecksimsConfig();
+                    final ChecksimsConfig swConf;
                     
                     JProgressBar progressBar = new JProgressBar(0, 100);
                     JProgressBar overallStatus = new JProgressBar(0, 8);
@@ -131,6 +134,12 @@ public class RunChecksimsListener implements ActionListener
                     tickProgress(overallStatus, message, "loading compilers");
                     
                     conf.setAlgorithm((SimilarityDetector<?>) selection.getSelectedValue());
+                    if(conf.getAlgorithm().equals(SmithWaterman.getInstance()) || conf.getAlgorithm().equals(LineSimilarityChecker.getInstance())) {
+                    		swConf = null;
+                    } else {
+                    		swConf = new ChecksimsConfig();
+                    		swConf.setAlgorithm(SmithWaterman.getInstance());
+                    }
     
                     tickProgress(overallStatus, message, "loading submissions (this may take a while)");
                     Set<File> all = new HashSet<>();
@@ -142,6 +151,11 @@ public class RunChecksimsListener implements ActionListener
                         {
                             conf.setSubmissions(ChecksimsCommandLine.getSubmissions(
                                     files, conf.getAlgorithm().getDefaultGlobPattern(), true, false));
+                            if(swConf != null) {
+                            		files  = submissionPaths.getFileSet();
+                            		swConf.setSubmissions(ChecksimsCommandLine.getSubmissions(
+                            				files, conf.getAlgorithm().getDefaultGlobPattern(), true, false));
+                            }
                         }
                         else
                         {
@@ -164,6 +178,11 @@ public class RunChecksimsListener implements ActionListener
                         {
                             conf.setArchiveSubmissions(ChecksimsCommandLine.getSubmissions(
                                     files, conf.getAlgorithm().getDefaultGlobPattern(), true, false));
+                            if(swConf != null) {
+                            		files = archivePaths.getFileSet();
+                            		swConf.setArchiveSubmissions(ChecksimsCommandLine.getSubmissions(
+                            				files, swConf.getAlgorithm().getDefaultGlobPattern(), true, false));
+                            }
                         }
                     }
                     catch (IOException | ChecksimsException e)
@@ -193,6 +212,21 @@ public class RunChecksimsListener implements ActionListener
                                 }
                             }).collect(Collectors.toList());
                             conf.setPreprocessors(preprops);
+                            
+                            if(swConf != null) {
+                            		files = commonCode.getFileSet();
+                            		List<SubmissionPreprocessor> swPreprops = files.stream().map(f -> {
+                            			try {
+                            				return ChecksimsCommandLine.getCommonCodeRemoval(
+                            						f.getAbsolutePath(),
+                            						all,
+                            						swConf.getAlgorithm().getDefaultGlobPattern());
+                            			} catch(ChecksimsException | IOException e) {
+                            				return null;
+                            			}
+                            		}).collect(Collectors.toList());
+                            		swConf.setPreprocessors(swPreprops);
+                            }
                         }
                     }
                     catch (Exception e)
@@ -210,7 +244,7 @@ public class RunChecksimsListener implements ActionListener
                         public void run() {
                             try
                             {
-                                Map<String, String> output = ChecksimsRunner.runChecksims(conf);
+                                Map<String, String> output = ChecksimsRunner.runChecksims(conf, swConf);
                                 tickProgress(overallStatus, message, "done");
                                 for(String strategy : output.keySet()) {
                                     System.out.println("\n\n");

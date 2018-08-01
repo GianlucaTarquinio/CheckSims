@@ -100,6 +100,16 @@ public final class ChecksimsRunner {
             throw new ChecksimsException("IO Exception reading version: " + e.getMessage(), e);
         }
     }
+    
+    public static ImmutableMap<String, String> runChecksims(ChecksimsConfig config) throws ChecksimsException {
+    		ImmutableMap results;
+    		try {
+    			results = runChecksims(config, null);
+    		} catch(ChecksimsException e) {
+    			throw e;
+    		}
+    		return results;
+    }
 
     /**
      * Main public entrypoint to Checksims. Runs similarity detection according to given configuration.
@@ -108,7 +118,7 @@ public final class ChecksimsRunner {
      * @return Map containing output of all output printers requested. Keys are name of output printer.
      * @throws ChecksimsException Thrown on error performing similarity detection
      */
-    public static ImmutableMap<String, String> runChecksims(ChecksimsConfig config) throws ChecksimsException {
+    public static ImmutableMap<String, String> runChecksims(ChecksimsConfig config, ChecksimsConfig backupConfig) throws ChecksimsException {
         checkNotNull(config);
 
         // Create a logger to log activity
@@ -154,24 +164,81 @@ public final class ChecksimsRunner {
         
         if (config.isIgnoringInvalid()) {
             Set<Submission> validSubmissions = new HashSet<>();
+            Set<Submission> invalidSubmissions = new HashSet<>();
             Set<Submission> validArchivedSubmissions = new HashSet<>();
+            Set<Submission> invalidArchivedSubmissions = new HashSet<>();
             Set<AlgorithmResults> validResults = new HashSet<>();
-            submissions.stream().filter(S -> !S.testFlag("invalid"))
-                                .forEach(S -> validSubmissions.add(S));
-            archiveSubmissions.stream().filter(S -> !S.testFlag("invalid"))
-                                       .forEach(S -> validArchivedSubmissions.add(S));
-            results.stream().filter(S -> S.isValid())
-                            .forEach(S -> validResults.add(S));
             
-            submissions = ImmutableSet.copyOf(validSubmissions);
-            archiveSubmissions = ImmutableSet.copyOf(validArchivedSubmissions);
+            for(Submission s : submissions) {
+            		if(s.testFlag("invalid")) {
+            			invalidSubmissions.add(s);
+            		} else {
+            			validSubmissions.add(s);
+            		}
+            }
+            
+            for(Submission s : archiveSubmissions) {
+	            	if(s.testFlag("invalid")) {
+	        			invalidArchivedSubmissions.add(s);
+	        		} else {
+	        			validArchivedSubmissions.add(s);
+	        		}
+            }
+            
+            for(AlgorithmResults ar : results) {
+            		if(ar.isValid()) {
+            			validResults.add(ar);
+            		}
+            }
+            
             results = validResults;
             
+            if(backupConfig != null && invalidSubmissions.size() > 0 || invalidArchivedSubmissions.size() > 0) {
+            		threads = backupConfig.getNumThreads();
+            		ParallelAlgorithm.shutdownExecutor();
+            		ParallelAlgorithm.setThreadCount(threads);
+            		System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", "" + threads);
+            		
+            		ImmutableSet<Submission> bSubmissions = backupConfig.getSubmissions();
+            		logs.info("Got " + bSubmissions.size() + " backup submissions to test.");
+            		
+            		ImmutableSet<Submission> bArchiveSubmissions = backupConfig.getArchiveSubmissions();
+                if(!bArchiveSubmissions.isEmpty()) {
+                    logs.info("Got " + bArchiveSubmissions.size() + " backup archive submissions to test.");
+                }
+                
+                for(SubmissionPreprocessor p : backupConfig.getPreprocessors()) {
+                    bSubmissions = ImmutableSet.copyOf(PreprocessSubmissions.process(p, bSubmissions, backupConfig.getStatusLogger()));
+                    if(!bArchiveSubmissions.isEmpty()) {
+                        bArchiveSubmissions = ImmutableSet.copyOf(PreprocessSubmissions.process(p, bArchiveSubmissions, backupConfig.getStatusLogger()));
+                    }
+                }
+                
+                if(bSubmissions.size() > 2) {              
+                		Set<Pair<Submission, Submission>> bPairs = PairGenerator.generatePairsWithArchive(bSubmissions,
+                        bArchiveSubmissions);
+                		Set<AlgorithmResults> bResults = AlgorithmRunner.runAlgorithm(bPairs, backupConfig.getAlgorithm(), backupConfig.getStatusLogger());                
+	                
+                		for(AlgorithmResults r : bResults) {
+	                		if(r.includes(invalidSubmissions) || r.includes(invalidArchivedSubmissions)) {
+	                			results.add(r);
+	                		}
+	                }
+                		
+                		validSubmissions.addAll(invalidSubmissions);
+                		validArchivedSubmissions.addAll(invalidArchivedSubmissions);
+                		
+                		submissions = ImmutableSet.copyOf(validSubmissions);
+                		archiveSubmissions = ImmutableSet.copyOf(validArchivedSubmissions);
+                }
+            } else {            
+            		submissions = ImmutableSet.copyOf(validSubmissions);
+            		archiveSubmissions = ImmutableSet.copyOf(validArchivedSubmissions);
+            }
         }
         
-        
-        
         SimilarityMatrix resultsMatrix = SimilarityMatrix.generateMatrix(submissions, archiveSubmissions, results);
+        
 
         // All parallel jobs are done, shut down the parallel executor
         ParallelAlgorithm.shutdownExecutor();

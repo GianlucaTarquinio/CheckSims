@@ -214,7 +214,7 @@ public final class ChecksimsRunner {
                     }
                 }
                 
-                if(bSubmissions.size() > 2) {              
+                if(bSubmissions.size() > 1) {              
                 		Set<Pair<Submission, Submission>> bPairs = PairGenerator.generatePairsWithArchive(bSubmissions,
                         bArchiveSubmissions);
                 		Set<AlgorithmResults> bResults = AlgorithmRunner.runAlgorithm(bPairs, backupConfig.getAlgorithm(), backupConfig.getStatusLogger());                

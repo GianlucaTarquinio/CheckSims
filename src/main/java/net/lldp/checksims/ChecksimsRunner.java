@@ -162,16 +162,20 @@ public final class ChecksimsRunner {
                 archiveSubmissions);
         Set<AlgorithmResults> results = AlgorithmRunner.runAlgorithm(allPairs, config.getAlgorithm(), config.getStatusLogger());
         
+        ImmutableSet<Submission> invalidSubs = null;
+        
         if (config.isIgnoringInvalid()) {
             Set<Submission> validSubmissions = new HashSet<>();
             Set<Submission> invalidSubmissions = new HashSet<>();
             Set<Submission> validArchivedSubmissions = new HashSet<>();
             Set<Submission> invalidArchivedSubmissions = new HashSet<>();
             Set<AlgorithmResults> validResults = new HashSet<>();
+            Set<Submission> invalidEntries = new HashSet<>();
             
             for(Submission s : submissions) {
             		if(s.testFlag("invalid")) {
             			invalidSubmissions.add(s);
+            			invalidEntries.add(s);
             		} else {
             			validSubmissions.add(s);
             		}
@@ -180,6 +184,7 @@ public final class ChecksimsRunner {
             for(Submission s : archiveSubmissions) {
 	            	if(s.testFlag("invalid")) {
 	        			invalidArchivedSubmissions.add(s);
+	        			invalidEntries.add(s);
 	        		} else {
 	        			validArchivedSubmissions.add(s);
 	        		}
@@ -192,6 +197,9 @@ public final class ChecksimsRunner {
             }
             
             results = validResults;
+            if(invalidEntries.size() > 0) {
+            		invalidSubs = ImmutableSet.copyOf(invalidEntries);
+            }
             
             if(backupConfig != null && invalidSubmissions.size() > 0 || invalidArchivedSubmissions.size() > 0) {
             		threads = backupConfig.getNumThreads();
@@ -238,6 +246,7 @@ public final class ChecksimsRunner {
         }
         
         SimilarityMatrix resultsMatrix = SimilarityMatrix.generateMatrix(submissions, archiveSubmissions, results);
+        resultsMatrix.setInvalidSubmissions(invalidSubs);
         
 
         // All parallel jobs are done, shut down the parallel executor

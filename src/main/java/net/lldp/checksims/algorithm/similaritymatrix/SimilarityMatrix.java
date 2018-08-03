@@ -48,6 +48,7 @@ public final class SimilarityMatrix {
     private final ImmutableList<Submission> xSubmissions;
     private final ImmutableList<Submission> ySubmissions;
     private final ImmutableSet<AlgorithmResults> builtFrom;
+    private ImmutableSet<Submission> invalidSubmissions;
 
     /**
      * Create a Similarity Matrix with given parameters. Internal constructor used by factory methods.
@@ -79,6 +80,7 @@ public final class SimilarityMatrix {
         checkArgument(!builtFrom.isEmpty(),
                 "Must provide Algorithm Results used to build similarity matrix - instead got empty set!");
 
+        this.invalidSubmissions = null;
         this.entries = entries;
         this.xSubmissions = ImmutableList.copyOf(xSubmissions);
         this.ySubmissions = ImmutableList.copyOf(ySubmissions);
@@ -366,5 +368,13 @@ public final class SimilarityMatrix {
         }
 
         return new SimilarityMatrix(matrix, xSubmissions, ySubmissions, results);
+    }
+    
+    public ImmutableSet<Submission> getInvalidSubmissions() {
+    		return invalidSubmissions;
+    }
+    
+    public void setInvalidSubmissions(ImmutableSet<Submission> invalidSubmissions) {
+    		this.invalidSubmissions = invalidSubmissions;
     }
 }

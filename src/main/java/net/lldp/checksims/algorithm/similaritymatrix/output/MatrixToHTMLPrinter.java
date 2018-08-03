@@ -23,6 +23,8 @@ package net.lldp.checksims.algorithm.similaritymatrix.output;
 
 import net.lldp.checksims.algorithm.InternalAlgorithmError;
 import net.lldp.checksims.algorithm.similaritymatrix.SimilarityMatrix;
+import net.lldp.checksims.submission.Submission;
+
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 

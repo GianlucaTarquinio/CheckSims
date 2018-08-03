@@ -21,8 +21,11 @@
 
 package net.lldp.checksims.algorithm.similaritymatrix.output;
 
+import java.util.Set;
+
 import net.lldp.checksims.algorithm.InternalAlgorithmError;
 import net.lldp.checksims.algorithm.similaritymatrix.SimilarityMatrix;
+import net.lldp.checksims.submission.Submission;
 import net.lldp.checksims.util.reflection.NamedInstantiable;
 
 /**

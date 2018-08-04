@@ -43,12 +43,13 @@ public class MainMenuView extends JPanel {
 	JPanel sessionPanel = null;
 	JLabel usernameLabel = null;
 	JLabel logOutButton = null;
+	JButton checkSims = null;
 	
 	public MainMenuView(ChecksimsInitializer a, MainMenu m) throws IOException {
 		app = a;
 		menu = m;
 		JFrame f = app.getFrame();
-		JButton checkSims = new JButton("Run CheckSims!");
+		checkSims = new JButton("Run CheckSims!");
         JButton helpMode = new JButton("Enable Help");
         
         JList<SimilarityDetector<? extends Percentable>> list =
@@ -190,6 +191,12 @@ public class MainMenuView extends JPanel {
 		} else {
 			usernameLabel.setText("Logged in as: " + username + " (" + service.getName() + ")");
 			sessionPanel.setVisible(true);
+		}
+	}
+	
+	public void enableChecksimsButton() {
+		if(checkSims != null) {
+			checkSims.setEnabled(true);
 		}
 	}
 }

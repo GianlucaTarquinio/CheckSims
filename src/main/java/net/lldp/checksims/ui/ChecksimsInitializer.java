@@ -20,17 +20,24 @@
  */
 package net.lldp.checksims.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
+import javax.swing.border.EmptyBorder;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.StyledDocument;
 
+import net.lldp.checksims.ui.buttons.FancyButtonAction;
+import net.lldp.checksims.ui.buttons.FancyButtonColorTheme;
+import net.lldp.checksims.ui.buttons.FancyButtonMouseListener;
 import net.lldp.checksims.ui.download.Service;
 import net.lldp.checksims.ui.download.canvas.CanvasService;
 
@@ -70,9 +77,25 @@ public class ChecksimsInitializer extends JPanel
         if (helpfulTip == null || helpfulTip != null)
         { // just show the exception
         		JPanel panel = new JPanel();
-        		panel.setLayout(new GridLayout(1, 1));
+        		panel.setLayout(new BorderLayout());
             JTextPane jta = new JTextPane();
-            panel.add(jta);
+            jta.setBackground(panel.getBackground());
+            jta.setBorder(new EmptyBorder(10, 10, 10, 10));
+            jta.setEditable(false);
+            panel.add(jta, BorderLayout.NORTH);
+            
+            JLabel backToMain = new JLabel("Back to Main Menu");
+            backToMain.setFont(new Font(backToMain.getFont().getFontName(), Font.PLAIN, 20));
+            backToMain.setBorder(new EmptyBorder(10, 10, 10, 10));
+            backToMain.addMouseListener(new FancyButtonMouseListener(backToMain, new FancyButtonAction() {
+	    	    		@Override
+	    	    		public void performAction() {
+	    	    			menuView.enableChecksimsButton();
+	    	    			goToMain();
+	    	    		}
+	    	    }, FancyButtonColorTheme.BROWSE));
+            
+            panel.add(backToMain, BorderLayout.SOUTH);
             StyledDocument doc = jta.getStyledDocument();
             if(e.getMessage() != null) {
 	            try {
@@ -152,6 +175,7 @@ public class ChecksimsInitializer extends JPanel
 	}
     
     public void goToMain() {
+    		menu.setCurrentFIO(null);
     		menuView.updateSessionPanel();
     		setPanel(menuView);
     }

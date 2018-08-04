@@ -111,6 +111,7 @@ public class RunChecksimsListener implements ActionListener
                     progressBar.setValue(0);
                     overallStatus.setValue(0);
                     
+                    uiPanel.removeAll();
                     uiPanel.setLayout(new BoxLayout(uiPanel, BoxLayout.Y_AXIS));
                     uiPanel.add(progressBar);
                     uiPanel.add(percent);

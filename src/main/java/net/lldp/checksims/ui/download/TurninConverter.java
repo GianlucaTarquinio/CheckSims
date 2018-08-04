@@ -14,6 +14,50 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 
 public class TurninConverter {
+	public static void main(String[] args) {
+		if(args.length != 3) {
+			System.out.println("Usage: TurninConverter <source directory> <target directory> <suffixes>");
+			return;
+		}
+		
+		File source = new File(args[0]);
+		File target = new File(args[1]);
+		String suffixes = args[2];
+		
+		if(!source.exists()) {
+			System.err.println("Error: '" + source.getAbsolutePath() + "' does not exist.");
+			return;
+		}
+		
+		if(target.exists()) {
+			System.err.println("Error: '" + target.getAbsolutePath() + "' already exists.");
+		}
+		
+		if(!source.isDirectory()) {
+			System.err.println("Error: '" + source.getAbsolutePath() + "' is not a directory.");
+			return;
+		}
+		
+		if(!target.mkdirs()) {
+			System.err.println("Error: '" + target.getAbsolutePath() + "' could not be created.");
+			return;
+		}
+		
+		for(File f : source.listFiles()) {
+			try {
+				if(f.isDirectory()) {
+					File to = new File(target.getPath() + "/" + f.getName());
+					to.mkdir();
+					formatSubmission(f, to, suffixes);
+				}
+			} catch(Exception e) {
+				System.err.println("Could not format: " + f.getAbsolutePath());
+				e.printStackTrace();
+				return;
+			}
+		}
+	}
+	
 	public static void formatSubmission(File from, File to, String suffixes) throws Exception {
 		if(!from.exists()) {
 			throw new Exception("'" + from.getAbsolutePath() + "' does not exist.");

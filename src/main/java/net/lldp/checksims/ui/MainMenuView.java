@@ -19,6 +19,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
 
 import net.lldp.checksims.algorithm.AlgorithmRegistry;
@@ -138,6 +139,8 @@ public class MainMenuView extends JPanel {
         algorithm.setPreferredSize(new Dimension(200, 175));
         list.setMinimumSize(new Dimension(200, 175));
         algorithm.add(list, BorderLayout.CENTER);
+        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        list.setSelectedValue(AlgorithmRegistry.getInstance().getDefaultImplementation(), false);
         list.addMouseListener(new BubbleUpEventDispatcher(algorithm));
         
         UI.setLayout(new BoxLayout(UI, BoxLayout.X_AXIS));

@@ -57,7 +57,7 @@ public class GraphicalMatrixPrinter implements MatrixPrinter
         
         Set<Submission> invalidSubs = matrix.getInvalidSubmissions();
         if(invalidSubs != null) {
-        		String invalidSubsStr = "Invalid submissions: ";
+        		String invalidSubsStr = "Smith-Waterman used on: ";
 	        for(Submission s : invalidSubs) {
 	        		invalidSubsStr += s.getName() + ", ";
 	        }

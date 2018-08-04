@@ -21,7 +21,7 @@
 
 package net.lldp.checksims.algorithm;
 
-import net.lldp.checksims.algorithm.linesimilarity.LineSimilarityChecker;
+import net.lldp.checksims.algorithm.smithwaterman.SmithWaterman;
 import net.lldp.checksims.parse.Percentable;
 import net.lldp.checksims.util.reflection.NoSuchImplementationException;
 import net.lldp.checksims.util.reflection.RegistryWithDefault;
@@ -33,7 +33,7 @@ public final class AlgorithmRegistry extends RegistryWithDefault<SimilarityDetec
     private static AlgorithmRegistry instance;
 
     private AlgorithmRegistry() throws NoSuchImplementationException {
-        super("net.lldp.checksims.algorithm", clazz(), LineSimilarityChecker.getInstance().getName());
+        super("net.lldp.checksims.algorithm", clazz(), SmithWaterman.getInstance().getName());
     }
     
     

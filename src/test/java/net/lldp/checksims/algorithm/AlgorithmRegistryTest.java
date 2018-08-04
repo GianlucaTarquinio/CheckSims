@@ -59,10 +59,10 @@ public class AlgorithmRegistryTest {
     }
 
     @Test
-    public void TestDefaultAlgorithmIsLineCompare() {
-        String lineCompareName = LineSimilarityChecker.getInstance().getName();
+    public void TestDefaultAlgorithmIsSmithWaterman() {
+        String smithWatermanName = SmithWaterman.getInstance().getName();
 
-        checkRegistryDefault(lineCompareName, instance);
+        checkRegistryDefault(smithWatermanName, instance);
     }
 
     @Test(expected = ChecksimsException.class)

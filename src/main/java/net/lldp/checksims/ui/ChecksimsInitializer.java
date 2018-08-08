@@ -50,7 +50,7 @@ import net.lldp.checksims.ui.download.canvas.CanvasService;
 public class ChecksimsInitializer extends JPanel
 {
 	public final static int MIN_USERNAME_LEN = 1;
-	public final static int MAX_USERNAME_LEN = 30;
+	public final static int MAX_USERNAME_LEN = 25;
 	public final static int MIN_PASSWORD_LEN = 5;
 	public final static int MAX_PASSWORD_LEN = 100;
 	public final static File DEFAULT_DOWNLOAD_PATH = new File(System.getProperty("user.home") + "/checksims/downloads");

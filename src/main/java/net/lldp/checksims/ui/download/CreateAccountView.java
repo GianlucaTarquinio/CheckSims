@@ -174,6 +174,19 @@ public class CreateAccountView extends JPanel {
 	    			} else if(!password.equals(confirmPassword)) {
 	    				JOptionPane.showMessageDialog(null, "Password and confirmation password do not match.", "Passwords Do Not Match", JOptionPane.ERROR_MESSAGE);
 	    			} else {
+	    				String[] usernames;
+	    				try {
+	    					usernames = service.getUsernames();
+	    				} catch(Exception e) {
+	    					JOptionPane.showMessageDialog(null, "Could not get " + service.getName() + " accounts.", service.getName() + " Error", JOptionPane.ERROR_MESSAGE);
+	    					return;
+	    				}
+	    				for(String u : usernames) {
+	    					if(username.equals(u)) {
+	    						JOptionPane.showMessageDialog(null, "The username you entered is already taken.", "Username Taken", JOptionPane.ERROR_MESSAGE);
+	    						return;
+	    					}
+	    				}
 	    				self.service.onCreateNew(username, password);
 	    			}
 	    		}

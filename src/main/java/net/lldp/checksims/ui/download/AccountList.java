@@ -160,6 +160,7 @@ public class AccountList extends JPanel {
 			char[] pass = passwordField.getPassword();
 			if(pass.length == 0) {
 				JOptionPane.showMessageDialog(null, "The password you entered is incorrect.", "Incorrect Password", JOptionPane.ERROR_MESSAGE);
+				return;
 			}
 			
 			info = service.getUserInfo(usernames[index]);

@@ -91,6 +91,7 @@ public class ChecksimsInitializer extends JPanel
 	    	    		@Override
 	    	    		public void performAction() {
 	    	    			menuView.enableChecksimsButton();
+	    	    			setTitle("Checksims Similarity Detector");
 	    	    			goToMain();
 	    	    		}
 	    	    }, FancyButtonColorTheme.BROWSE));
@@ -198,5 +199,9 @@ public class ChecksimsInitializer extends JPanel
 
 	public void setSessionService(Service sessionService) {
 		this.sessionService = sessionService;
+	}
+	
+	public void setTitle(String title) {
+		titleableFrame.setTitle(title);
 	}
 }

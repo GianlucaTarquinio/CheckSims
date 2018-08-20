@@ -32,8 +32,8 @@ public class CanvasService extends Service {
 	
 	private static boolean authFailed = false;
 	
-	public CanvasService(ChecksimsInitializer app, String name, String folderName) {
-		super(app, name, folderName);
+	public CanvasService(ChecksimsInitializer app) {
+		super(app, "Canvas", "canvas");
 	}
 	
 	public void setAuthCode(String authCode) {

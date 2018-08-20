@@ -64,7 +64,7 @@ public class ChecksimsInitializer extends JPanel
     private JPanel currentView = this;
     private MainMenu menu;
     private MainMenuView menuView;
-    private final Service[] services = { new CanvasService(this, "Canvas", "canvas") };
+    private final Service[] services = { new CanvasService(this) };
     
     /**
      * Use this panel to show exceptions. Hide the other UI components

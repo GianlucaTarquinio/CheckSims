@@ -21,8 +21,8 @@ import net.lldp.checksims.ui.download.Encryption;
 import net.lldp.checksims.ui.download.Service;
 
 public class CanvasService extends Service {
-	public static String id = "77820000000000013";
-	private static String secret = "T6XJ0NTAbP2ooeBHj64jNRUGETN59JIw14DCfTFADcKKakbLPFgwhbB1fYtCtpRM";
+	public static String id = ""; //CLIENT ID GOES HERE
+	private static String secret = ""; //CLIENT SECRET GOES HERE
 	
 	public static String baseUrl = "https://canvas.wpi.edu";
 	
